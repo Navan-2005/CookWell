@@ -12,10 +12,10 @@ function App() {
 
   return (
     <>
-      {/* <ChatBot/> */}
+      <ChatBot/>
        {/* <UploadImage/> */}
        
-       <Community/>
+       {/* <Community/> */}
     </>
   )
 }
