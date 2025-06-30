@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
+import {Provider} from 'react-redux'
+import store from './redux/store'
 import './App.css'
 import UploadImage from './components/UploadImage'
 import ChatBot from './components/Chatbot'
@@ -12,10 +14,14 @@ function App() {
 
   return (
     <>
-      <ChatBot/>
-       {/* <UploadImage/> */}
-       
-       {/* <Community/> */}
+      <Provider store={store}>
+        <BrowserRouter>
+        <Routes>
+          <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Register />} />
+        </Routes>
+      </BrowserRouter>
+        </Provider>
     </>
   )
 }
