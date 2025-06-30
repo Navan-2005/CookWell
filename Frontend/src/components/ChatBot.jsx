@@ -256,7 +256,7 @@ const ChatBot = () => {
                 isListening ? 'text-red-500' : 'text-gray-600'
               }`}
               title="Speak"
-            >
+            > 
               <Mic size={18} />
             </button>
             <button

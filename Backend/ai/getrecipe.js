@@ -7,7 +7,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 async function generateRecipe(ingredients) {
   // Use the latest model name (important!)
   const model = genAI.getGenerativeModel({ 
-    model: "gemini-1.5-pro-latest",  // Updated model name
+    model: "gemini-2.5-flash",  // Updated model name
     apiVersion: "v1"                 // Force v1 API
   });
 

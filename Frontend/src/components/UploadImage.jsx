@@ -56,7 +56,7 @@ function App() {
       });
       console.log('Ingrredients : ',res.data.ingredients);
       
-      const recipe=await axios.post("http://localhost:3000/ai/get-recipe",{ingredients:res.data.ingredients});
+      const recipe=await axios.post("http://localhost:3000/ai/generate-recipe",{ingredients:res.data.ingredients});
        
       console.log('recipe : ',recipe.data.recipe);
       
