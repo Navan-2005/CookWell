@@ -3,29 +3,43 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../redux/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { toast } from "sonner";
+import { setUser } from '../redux/slices/userslice';
+import axios from 'axios';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, token, loading, error } = useSelector((state) => state.auth);
+  const { user} = useSelector((state) => state.user);
 
-  // useEffect(() => {
-  //   if (token) {
-  //     navigate('/recipes');
-  //   }
-  // }, [token, navigate]);
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
+    console.log('Email and password : ',email,password);
+    
+    const response=await axios.post('http://localhost:3000/user/login',
+      {
+        email,
+        password
+      }
+    )
+    if(response.status===200){
+      localStorage.setItem('token',response.data.token);
+      dispatch(setUser(response.data.user));
+      console.log(response.data.user);
+      navigate('/');
+    }
     dispatch(loginUser({ email, password }));
+    toast.success("Login successful (demo mode)", {
+      description: `Welcome back, ${response.data.user.username}! This is just a demo, no actual authentication yet.`,
+    });
   };
 
   return (
     <div className="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow">
       <h2 className="text-2xl font-semibold mb-4">Login</h2>
-      {error && <p className="mb-4 text-red-600">{error}</p>}
+      {/* {error && <p className="mb-4 text-red-600">{error}</p>} */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="email"
@@ -47,10 +61,10 @@ export default function Login() {
         />
         <button
           type="submit"
-          disabled={loading}
-          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 disabled:opacity-50"
-        >
-          {loading ? 'Logging in...' : 'Login'}
+          // disabled={loading}
+          className="w-full h-12 bg-green-600 text-white py-2 rounded hover:bg-green-700 disabled:opacity-50"
+        > login
+          {/* {loading ? 'Logging in...' : 'Login'} */}
         </button>
       </form>
     </div>

@@ -9,7 +9,6 @@ import Community from './components/Community'
 import Login from './Pages/Login'
 import Register from './Pages/Register'
 
-
 function App() {
   const [count, setCount] = useState(0)
 
