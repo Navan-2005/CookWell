@@ -11,11 +11,11 @@ export default function Login() {
   const navigate = useNavigate();
   const { user, token, loading, error } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    if (token) {
-      navigate('/recipes');
-    }
-  }, [token, navigate]);
+  // useEffect(() => {
+  //   if (token) {
+  //     navigate('/recipes');
+  //   }
+  // }, [token, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

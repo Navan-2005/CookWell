@@ -13,11 +13,11 @@ export default function Register() {
   const navigate = useNavigate();
   const { token, loading, error } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    if (token) {
-      navigate('/recipes');
-    }
-  }, [token, navigate]);
+  // useEffect(() => {
+  //   if (token) {
+  //     navigate('/recipes');
+  //   }
+  // }, [token, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
