@@ -5,8 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const dietaryOptions = ['vegan', 'vegetarian', 'keto', 'gluten-free', 'paleo', 'dairy-free'];
-const cuisines = ['italian', 'mexican', 'indian', 'chinese', 'american', 'french'];
+const dietaryOptions = ['vegetarian',  'dairy-free'];
 
 export default function Profile() {
   const { token, user } = useSelector((state) => state.auth);
@@ -17,8 +16,7 @@ export default function Profile() {
     email: '',
     dietaryPreferences: [],
     allergies: [],
-    cuisineLikes: [],
-    cuisineDislikes: [],
+    
     fitnessGoals: '',
   });
   const [loading, setLoading] = useState(true);
@@ -41,8 +39,6 @@ export default function Profile() {
           email: response.data.email,
           dietaryPreferences: response.data.dietaryPreferences || [],
           allergies: response.data.allergies || [],
-          cuisineLikes: response.data.cuisineLikes || [],
-          cuisineDislikes: response.data.cuisineDislikes || [],
           fitnessGoals: response.data.fitnessGoals || '',
         });
       } catch (e) {
@@ -74,8 +70,6 @@ export default function Profile() {
         {
           dietaryPreferences: profileData.dietaryPreferences,
           allergies: profileData.allergies,
-          cuisineLikes: profileData.cuisineLikes,
-          cuisineDislikes: profileData.cuisineDislikes,
           fitnessGoals: profileData.fitnessGoals,
         },
         {

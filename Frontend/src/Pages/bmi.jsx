@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function KetoMealPlan() {
+export default function BMI() {
   const [selectedGender, setSelectedGender] = useState('male');
 
   return (
@@ -37,7 +37,11 @@ export default function KetoMealPlan() {
             SIMPLE
           </h1>
           <h2 className="text-5xl md:text-7xl font-bold tracking-wider mb-8">
-            KETO MEAL PLAN
+            PERSONALISED
+           
+          </h2>
+          <h2 className="text-5xl md:text-7xl font-bold tracking-wider mb-8">
+            DIET
           </h2>
           <p className="text-lg md:text-xl text-gray-300 max-w-md mx-auto">
             Find out how much weight you'll lose with our diet
@@ -107,7 +111,7 @@ export default function KetoMealPlan() {
             The average participant can expect to lose 1-2 lbs/week.
           </p>
           <br />
-          <p>© 2020 KetoFun. All rights reserved.</p>
+          <p>© 2025 BMIFun. All rights reserved.</p>
           <p className="leading-relaxed">
             *Statements regarding your profile and the results of our quiz have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure or prevent any disease. You should consult with a medical professional before starting any diet or weight loss program.
           </p>

@@ -10,22 +10,22 @@ export default function Favorites() {
   const { token } = useSelector((state) => state.auth);
   const { favorites, loading, error } = useSelector((state) => state.favorites);
 
-  useEffect(() => {
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-    dispatch(fetchFavorites());
-  }, [dispatch, token, navigate]);
+  // useEffect(() => {
+  //   if (!token) {
+  //     navigate('/login');
+  //     return;
+  //   }
+  //   dispatch(fetchFavorites());
+  // }, [dispatch, token, navigate]);
 
-  if (!token) return null;
+  // if (!token) return null;
 
   return (
     <div>
       <h1 className="text-3xl font-bold mb-4">Your Favorite Recipes</h1>
-      {loading && <p>Loading favorites...</p>}
-      {error && <p className="text-red-600">{error}</p>}
-      {!loading && favorites.length === 0 && <p>You have no favorite recipes yet.</p>}
+      {/* {loading && <p>Loading favorites...</p>} */}
+      {/* {error && <p className="text-red-600">{error}</p>} */}
+      {favorites.length === 0 && <p>You have no favorite recipes yet.</p>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {favorites.map((recipe) => (

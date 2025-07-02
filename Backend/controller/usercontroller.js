@@ -1,5 +1,6 @@
 const User=require('../models/User')
 const favourites=require('../models/favourites')
+const mongoose=require('mongoose');
 
 const createUser = async (req, res) => {
     try {
@@ -56,10 +57,11 @@ const createUser = async (req, res) => {
 
   const save =async(req,res)=>{
     try {
-      const { title, ingredients, steps, image } = req.body;
+      const { userId, title, ingredients, steps, image } = req.body;
 
   const favorite = {
-    recipeId: new mongoose.Types.ObjectId(), // Generate unique ID
+    recipeId: new mongoose.Types.ObjectId(), 
+    userId,// Generate unique ID
     title,
     ingredients,
     steps,
@@ -68,13 +70,15 @@ const createUser = async (req, res) => {
     source: 'chatbot' // Track origin
   };
 
-  await User.findByIdAndUpdate(
-    req.user.id,
-    { $addToSet: { favorites: favorite } },
-    { new: true }
-  );
+  // await User.findByIdAndUpdate(
+  //   req.user._id,
+  //   { $addToSet: { favorites: favorite } },
+  //   { new: true }
+  // );
 
-  res.status(201).json(favorite);
+  const newfavorite =  new favourites(favorite);
+  await newfavorite.save();
+  res.status(201).json(newfavorite);
     } catch (error) {
       console.log('Error in saving recipe : ',error.message);
       res.status(400).json({ error: error.message });
@@ -95,5 +99,6 @@ const createUser = async (req, res) => {
     getUsers,
     loginuser,
     getprofile,
-    getallusers
+    getallusers,
+    save
   }
