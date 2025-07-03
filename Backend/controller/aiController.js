@@ -1,5 +1,6 @@
 const generateRecipe = require("../ai/getrecipe");
 const getRecipe = require("../ai/recipefromtext");
+const getdiet = require("../ai/bmicalculator");
 
 const generateRecipefromimg = async (req, res) => {
   const { ingredients } = req.body;
@@ -31,6 +32,18 @@ const getRecipefromtxt = async (req, res) => {
   }
 };
 
+const getpersonalised = async (req,res)=>{
+  const {bmi,type,age,gender,veg}=req.body;
+  try {
+    const recipe = await getdiet(bmi,type);
+    res.status(200).json({ recipe });
+  } catch (error) {
+    console.log('Getting diet error : ',error);
+    res.status(500).json({ error: "Error generating recipe" });
+  }
+
+}
+
 module.exports = {
-  generateRecipefromimg,getRecipefromtxt
+  generateRecipefromimg,getRecipefromtxt,getpersonalised
 };

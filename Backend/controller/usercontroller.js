@@ -94,6 +94,10 @@ const createUser = async (req, res) => {
     }
   }
 
+  const contactpage = async(req,res)=>{
+    
+  }
+
   module.exports={
     createUser,
     getUsers,
