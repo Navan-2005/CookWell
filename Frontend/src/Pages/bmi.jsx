@@ -1,118 +1,128 @@
 import { useState } from 'react';
 
-export default function KetoMealPlan() {
-  const [selectedGender, setSelectedGender] = useState('male');
+export default function BMICalculator() {
+  const [weight, setWeight] = useState('');
+  const [height, setHeight] = useState('');
+  const [bmi, setBmi] = useState(null);
+  const [category, setCategory] = useState('');
+
+  const calculateBMI = () => {
+    if (weight && height) {
+      const weightNum = parseFloat(weight);
+      const heightNum = parseFloat(height);
+      
+      if (weightNum > 0 && heightNum > 0) {
+        // Calculate BMI: weight (kg) / height (m)²
+        const bmiValue = weightNum / (heightNum * heightNum);
+        setBmi(bmiValue.toFixed(1));
+        
+        // Determine category
+        if (bmiValue < 18.5) {
+          setCategory('Underweight');
+        } else if (bmiValue >= 18.5 && bmiValue < 25) {
+          setCategory('Normal weight');
+        } else if (bmiValue >= 25 && bmiValue < 30) {
+          setCategory('Overweight');
+        } else {
+          setCategory('Obese');
+        }
+      }
+    }
+  };
+
+  const reset = () => {
+    setWeight('');
+    setHeight('');
+    setBmi(null);
+    setCategory('');
+  };
+
+  const getCategoryColor = () => {
+    switch (category) {
+      case 'Underweight':
+        return 'text-blue-600';
+      case 'Normal weight':
+        return 'text-green-600';
+      case 'Overweight':
+        return 'text-orange-600';
+      case 'Obese':
+        return 'text-red-600';
+      default:
+        return 'text-gray-600';
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
-      {/* Background Images */}
-      <div className="absolute inset-0 flex">
-        {/* Left side - broccoli image */}
-        <div className="w-1/3 h-full">
-          <img 
-            src="https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
-            alt="Fresh broccoli" 
-            className="w-full h-full object-cover opacity-70"
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+      <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
+        BMI Calculator
+      </h1>
+      
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Weight (kg)
+          </label>
+          <input
+            type="number"
+            value={weight}
+            onChange={(e) => setWeight(e.target.value)}
+            placeholder="Enter your weight"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
         
-        {/* Right side - pizza image */}
-        <div className="w-2/3 h-full">
-          <img 
-            src="https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
-            alt="Delicious pizza" 
-            className="w-full h-full object-cover opacity-60"
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Height (m)
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            value={height}
+            onChange={(e) => setHeight(e.target.value)}
+            placeholder="Enter your height (e.g., 1.75)"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
-      </div>
-
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black bg-opacity-60"></div>
-
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 text-center text-white">
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-sm font-light tracking-[0.3em] text-gray-300 mb-4">
-            SIMPLE
-          </h1>
-          <h2 className="text-5xl md:text-7xl font-bold tracking-wider mb-8">
-            KETO MEAL PLAN
-          </h2>
-          <p className="text-lg md:text-xl text-gray-300 max-w-md mx-auto">
-            Find out how much weight you'll lose with our diet
-          </p>
+        
+        <div className="flex space-x-3">
+          <button
+            onClick={calculateBMI}
+            className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
+          >
+            Calculate BMI
+          </button>
+          <button
+            onClick={reset}
+            className="flex-1 bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-200"
+          >
+            Reset
+          </button>
         </div>
-
-        {/* Gender Selection */}
-        <div className="mb-8">
-          <div className="flex items-center justify-center bg-gray-800 rounded-full p-2 border-2 border-green-500">
-            <button
-              onClick={() => setSelectedGender('male')}
-              className={`flex items-center justify-center w-16 h-16 rounded-full transition-all duration-300 ${
-                selectedGender === 'male' 
-                  ? 'bg-white text-gray-800' 
-                  : 'bg-transparent text-white hover:bg-gray-700'
-              }`}
-            >
-              <svg 
-                width="24" 
-                height="24" 
-                viewBox="0 0 24 24" 
-                fill="currentColor"
-                className="w-6 h-6"
-              >
-                <path d="M9 9C10.29 9 11.5 9.41 12.47 10.11L17.58 5H13V3H21V11H19V6.41L13.89 11.5C14.59 12.5 15 13.7 15 15C15 18.31 12.31 21 9 21S3 18.31 3 15 5.69 9 9 9M9 11C6.79 11 5 12.79 5 15S6.79 19 9 19 13 17.21 13 15 11.21 11 9 11Z"/>
-              </svg>
-            </button>
-            
-            <div className="w-px h-12 bg-gray-600 mx-4"></div>
-            
-            <button
-              onClick={() => setSelectedGender('female')}
-              className={`flex items-center justify-center w-16 h-16 rounded-full transition-all duration-300 ${
-                selectedGender === 'female' 
-                  ? 'bg-white text-gray-800' 
-                  : 'bg-transparent text-white hover:bg-gray-700'
-              }`}
-            >
-              <svg 
-                width="24" 
-                height="24" 
-                viewBox="0 0 24 24" 
-                fill="currentColor"
-                className="w-6 h-6"
-              >
-                <path d="M12 4C9.21 4 7 6.21 7 9C7 11.79 9.21 14 12 14C14.79 14 17 11.79 17 9C17 6.21 14.79 4 12 4M12 6C13.68 6 15 7.32 15 9C15 10.68 13.68 12 12 12C10.32 12 9 10.68 9 9C9 7.32 10.32 6 12 6M21 21L19 19H13V17H19L21 15V21M11 16H13V19H15V21H13V22H11V21H9V19H11V16Z"/>
-              </svg>
-            </button>
-          </div>
+      </div>
+      
+      {bmi && (
+        <div className="mt-6 p-4 bg-gray-50 rounded-md">
+          <h2 className="text-lg font-semibold text-gray-800 mb-2">Result:</h2>
+          <p className="text-2xl font-bold text-blue-600 mb-1">
+            BMI: {bmi}
+          </p>
+          <p className={`text-lg font-medium ${getCategoryColor()}`}>
+            Category: {category}
+          </p>
           
-          <div className="flex justify-between items-center mt-4 px-4">
-            <span className="text-sm text-gray-300">Male</span>
-            <span className="text-sm text-gray-300">Female</span>
+          <div className="mt-4 text-sm text-gray-600">
+            <h3 className="font-medium mb-2">BMI Categories:</h3>
+            <ul className="space-y-1">
+              <li className="text-blue-600">Underweight: Below 18.5</li>
+              <li className="text-green-600">Normal weight: 18.5 - 24.9</li>
+              <li className="text-orange-600">Overweight: 25 - 29.9</li>
+              <li className="text-red-600">Obese: 30 and above</li>
+            </ul>
           </div>
         </div>
-
-        {/* CTA Button */}
-        <button className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 px-12 rounded-full text-lg tracking-wide transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl mb-12">
-          CHOOSE YOUR GENDER
-        </button>
-
-        {/* Disclaimer */}
-        <div className="max-w-4xl mx-auto text-xs text-gray-400 space-y-2">
-          <p>
-            *Results vary depending on your starting point, goals, and effort.
-            <br />
-            The average participant can expect to lose 1-2 lbs/week.
-          </p>
-          <br />
-          <p>© 2020 KetoFun. All rights reserved.</p>
-          <p className="leading-relaxed">
-            *Statements regarding your profile and the results of our quiz have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure or prevent any disease. You should consult with a medical professional before starting any diet or weight loss program.
-          </p>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
