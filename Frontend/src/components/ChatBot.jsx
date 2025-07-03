@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Bot, User, Mic, Star, BookOpen, Trash } from 'lucide-react';
+import { useSelector,useDispatch } from 'react-redux';
 import axios from 'axios';
 
 const ChatBot = () => {
@@ -13,6 +14,9 @@ const ChatBot = () => {
   const [activeView, setActiveView] = useState('chat'); // 'chat' or 'saved'
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  const {user}=useSelector((state) => state.user);
+  const dispatch=useDispatch();
 
   useEffect(() => {
     scrollToBottom();
@@ -73,9 +77,14 @@ const ChatBot = () => {
     try {
       // Attempt to parse the recipe into structured format
       const parsedRecipe = parseRecipe(currentRecipe);
-
+      console.log('parsedRecipe',parsedRecipe);
+      console.log('Title : ', parsedRecipe.title);
+      
+      
       // Send save request to backend
-      await axios.post('/api/favorites', parsedRecipe);
+      const response = await axios.post('http://localhost:3000/user/saverecipe', parsedRecipe);
+      
+      console.log('Response data : ',response.data);
 
       alert('Recipe saved successfully!');
       setCurrentRecipe(null);
@@ -120,11 +129,12 @@ const ChatBot = () => {
       : [];
 
     return {
+      userId:user._id,
       title,
       ingredients,
       steps,
       image: '', // You might want to add image generation or upload logic
-      source: 'chatbot'
+      // source: 'chatbot'
     };
   };
 

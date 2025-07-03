@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { User, Mail, Ruler, Weight, Calendar } from 'lucide-react';
 
+<<<<<<< HEAD
 export default function ProfilePage() {
   const [profile, setProfile] = useState({
     name: '',
@@ -8,10 +9,27 @@ export default function ProfilePage() {
     height: '',
     weight: '',
     age: ''
+=======
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const dietaryOptions = ['vegetarian',  'dairy-free'];
+
+export default function Profile() {
+  const { token, user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+
+  const [profileData, setProfileData] = useState({
+    username: '',
+    email: '',
+    dietaryPreferences: [],
+    allergies: [],
+    
+    fitnessGoals: '',
+>>>>>>> 6ad258c2c49f402f1a457477df959b421a0a257c
   });
   const [isEditing, setIsEditing] = useState(true);
   const [errors, setErrors] = useState({});
 
+<<<<<<< HEAD
   const handleInputChange = (field, value) => {
     setProfile(prev => ({
       ...prev,
@@ -24,6 +42,66 @@ export default function ProfilePage() {
         ...prev,
         [field]: ''
       }));
+=======
+  useEffect(() => {
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    async function fetchProfile() {
+      setLoading(true);
+      try {
+        const response = await axios.get(`${API_URL}/users/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setProfileData({
+          username: response.data.username,
+          email: response.data.email,
+          dietaryPreferences: response.data.dietaryPreferences || [],
+          allergies: response.data.allergies || [],
+          fitnessGoals: response.data.fitnessGoals || '',
+        });
+      } catch (e) {
+        setMessage('Failed to load profile info');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProfile();
+  }, [token, navigate]);
+
+  // Handlers
+  const toggleArrayValue = (field, value) => {
+    setProfileData((prev) => {
+      const arr = prev[field];
+      if (arr.includes(value)) {
+        return { ...prev, [field]: arr.filter((v) => v !== value) };
+      }
+      return { ...prev, [field]: [...arr, value] };
+    });
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setMessage('');
+    try {
+      await axios.put(
+        `${API_URL}/users/me`,
+        {
+          dietaryPreferences: profileData.dietaryPreferences,
+          allergies: profileData.allergies,
+          fitnessGoals: profileData.fitnessGoals,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setMessage('Profile saved successfully!');
+    } catch (e) {
+      setMessage('Failed to save profile.');
+    } finally {
+      setSaving(false);
+>>>>>>> 6ad258c2c49f402f1a457477df959b421a0a257c
     }
   };
 

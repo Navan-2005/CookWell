@@ -8,8 +8,8 @@ const favoriteSchema = new mongoose.Schema({
   steps: { type: [String] },
   image: String,
   savedAt: { type: Date, default: Date.now }
-}, { _id: false }); // Prevents nested IDs
+}); // Prevents nested IDs
 
-const favourites = mongoose.model('favourites', favoriteSchema);
+const favourites = mongoose.model('save', favoriteSchema);
 
 module.exports = favourites;
