@@ -133,11 +133,26 @@ const createUser = async (req, res) => {
   }
 };
 
+const getfavourites=async(req,res)=>{
+  const { userId } = req.body;
+  try {
+    // const favorites = await favourites.findById({ userId });
+    const response = await favourites.find({userId:userId});
+    console.log('favorites : ',response);
+    // const filteredFavorites = response.favorites.filter(favorite => favorite.userId === userId);
+    res.status(200).json({response});
+  } catch (error) {
+    console.log('Error in getting favourites : ',error.message);
+    res.status(400).json({ error: error.message });
+  }
+}
+
   module.exports={
     createUser,
     getUsers,
     loginuser,
     getprofile,
     getallusers,
-    save
+    save,
+    getfavourites
   }

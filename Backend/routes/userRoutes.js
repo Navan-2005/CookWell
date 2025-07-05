@@ -1,6 +1,6 @@
 // routes/userRoutes.js
 const express = require('express');
-const { createUser, getUsers,loginuser,getprofile,getallusers,save } = require('../controller/usercontroller');
+const { createUser, getUsers,loginuser,getprofile,getallusers,save,getfavourites } = require('../controller/usercontroller');
 const router = express.Router();
 const authmiddleware=require('../middlewares/authmiddleware')
 
@@ -10,5 +10,6 @@ router.post('/profile',authmiddleware.authUser,getprofile)    // Route to get al
 router.post('/login',loginuser)
 router.post('/getallusers',getallusers)
 router.post('/saverecipe',save)
+router.post('/getfavourites',getfavourites)
 
 module.exports = router;
