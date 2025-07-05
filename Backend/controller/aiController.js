@@ -33,13 +33,15 @@ const getRecipefromtxt = async (req, res) => {
 };
 
 const getpersonalised = async (req,res)=>{
-  const {bmi,type,age,gender,veg}=req.body;
+  const {user}=req.body;
   try {
-    const recipe = await getdiet(bmi,type);
-    res.status(200).json({ recipe });
+    const recipe = await getdiet(user);
+    console.log(recipe);
+    
+    res.status(200).json({ dietPlan:recipe });
   } catch (error) {
     console.log('Getting diet error : ',error);
-    res.status(500).json({ error: "Error generating recipe" });
+    res.status(500).send({ error});
   }
 
 }
