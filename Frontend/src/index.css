@@ -1,4 +1,7 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;500;600;700;800;900&display=swap");
+
 @import "tailwindcss";
+
 html, body, #root {
   height: 100%;
   margin: 0;
@@ -73,7 +76,6 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
-@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;500;600;700;800;900&display=swap");
 
 body {
   margin: 0;

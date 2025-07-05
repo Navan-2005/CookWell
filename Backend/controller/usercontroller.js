@@ -1,7 +1,9 @@
 const User=require('../models/User')
 const favourites=require('../models/favourites')
 const mongoose=require('mongoose');
-
+const nodemailer=require('nodemailer');
+const dotenv = require('dotenv');
+dotenv.config();
 const createUser = async (req, res) => {
     try {
       const { username, email, password } = req.body;
@@ -94,9 +96,42 @@ const createUser = async (req, res) => {
     }
   }
 
-  const contactpage = async(req,res)=>{
-    
+  const sendContactEmail = async (req, res) => {
+  const { name, email, message } = req.body;
+
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: 'Please fill in all fields.' });
   }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail', // You can also use 'smtp.mailtrap.io', etc.
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: email,
+      to: process.env.EMAIL_USER,
+      subject: `Contact Form Submission from ${name}`,
+      text: `
+        Name: ${name}
+        Email: ${email}
+        Message:
+        ${message}
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ message: 'Email sent successfully!' });
+  } catch (error) {
+    console.error('Email send error:', error);
+    res.status(500).json({ error: 'Failed to send email.' });
+  }
+};
 
   module.exports={
     createUser,

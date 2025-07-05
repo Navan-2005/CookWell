@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Logo from '../images/logo.png'
+import Logo from '../../../assets/landingpageimages/logo.png'
 import { HiMenuAlt3 } from 'react-icons/hi'
 import { AiOutlineClose } from 'react-icons/ai'
 // import Button from './Button'

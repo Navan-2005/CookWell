@@ -2,7 +2,7 @@ import React from 'react'
 import Header from '../components/Header'
 //import Recipes from '../components/Recipes'
 
-const Home = () => {
+const Landing = () => {
   return (
     <main className='w-full flex flex-col'>
       <Header
@@ -22,4 +22,4 @@ const Home = () => {
   )
 }
 
-export default Home
+export default Landing

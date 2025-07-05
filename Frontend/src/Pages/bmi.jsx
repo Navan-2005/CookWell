@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-<<<<<<< HEAD
 export default function BMICalculator() {
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
@@ -52,10 +51,6 @@ export default function BMICalculator() {
         return 'text-gray-600';
     }
   };
-=======
-export default function BMI() {
-  const [selectedGender, setSelectedGender] = useState('male');
->>>>>>> 6ad258c2c49f402f1a457477df959b421a0a257c
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
@@ -90,7 +85,6 @@ export default function BMI() {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
-<<<<<<< HEAD
         
         <div className="flex space-x-3">
           <button
@@ -105,30 +99,6 @@ export default function BMI() {
           >
             Reset
           </button>
-=======
-      </div>
-
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black bg-opacity-60"></div>
-
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 text-center text-white">
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-sm font-light tracking-[0.3em] text-gray-300 mb-4">
-            SIMPLE
-          </h1>
-          <h2 className="text-5xl md:text-7xl font-bold tracking-wider mb-8">
-            PERSONALISED
-           
-          </h2>
-          <h2 className="text-5xl md:text-7xl font-bold tracking-wider mb-8">
-            DIET
-          </h2>
-          <p className="text-lg md:text-xl text-gray-300 max-w-md mx-auto">
-            Find out how much weight you'll lose with our diet
-          </p>
->>>>>>> 6ad258c2c49f402f1a457477df959b421a0a257c
         </div>
       </div>
       
@@ -152,30 +122,7 @@ export default function BMI() {
             </ul>
           </div>
         </div>
-<<<<<<< HEAD
       )}
-=======
-
-        {/* CTA Button */}
-        <button className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 px-12 rounded-full text-lg tracking-wide transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl mb-12">
-          CHOOSE YOUR GENDER
-        </button>
-
-        {/* Disclaimer */}
-        <div className="max-w-4xl mx-auto text-xs text-gray-400 space-y-2">
-          <p>
-            *Results vary depending on your starting point, goals, and effort.
-            <br />
-            The average participant can expect to lose 1-2 lbs/week.
-          </p>
-          <br />
-          <p>© 2025 BMIFun. All rights reserved.</p>
-          <p className="leading-relaxed">
-            *Statements regarding your profile and the results of our quiz have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure or prevent any disease. You should consult with a medical professional before starting any diet or weight loss program.
-          </p>
-        </div>
-      </div>
->>>>>>> 6ad258c2c49f402f1a457477df959b421a0a257c
     </div>
   );
 }
