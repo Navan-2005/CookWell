@@ -17,6 +17,8 @@ import Header from './Pages/landingpage/components/Header.jsx'
 import Landing from './Pages/landingpage/Home.jsx'
 import BMICalculator from './Pages/bmi.jsx'
 import DietForm from './Pages/DietForm.jsx'
+import Favorites from './Pages/Favorites.jsx'
+import RecipeDetails from './Pages/RecipeDetails.jsx'
 
 // Layout component
 function Layout() {
@@ -51,6 +53,8 @@ function App() {
             <Route path='/diet' element={<DietForm/>} />
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
+            <Route path='/favorites' element={<Favorites />} />
+            <Route path='/recipe/:recipeId' element={<RecipeDetails/>}/>
           </Routes>
         </div>
       </BrowserRouter>
