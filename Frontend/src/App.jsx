@@ -20,17 +20,18 @@ import DietForm from './Pages/DietForm.jsx'
 import Favorites from './Pages/Favorites.jsx'
 import RecipeDetails from './Pages/RecipeDetails.jsx'
 import RecipeChatBot from './chatbolt.jsx'
+import { Layout } from './Pages/Layout.jsx'
 
 // Layout component
-function Layout() {
-  return (
-    <>
-      <Navbar />
-      <Outlet />
-      <Footer />
-    </>
-  )
-}
+// function Layout() {
+//   return (
+//     <div className='flex flex-col w-full h-screen'>
+//       <Navbar />
+//       <Outlet />
+//       <Footer />
+//     </div>
+//   )
+// }
 
 // Main App
 function App() {
@@ -42,12 +43,14 @@ function App() {
         <div className='bg-black'>
           <Routes>
             {/* Routes using shared Layout */}
-            <Route path='/' element={<Layout />}>
+            {/* <Route path='/' element={<Layout />}>
               <Route index element={<Landing />} />
               <Route path='community' element={<Community />} />
               <Route path='upload' element={<UploadImage />} />
-              {/* Add more nested routes here if needed */}
-            </Route>
+              {/* Add more nested routes here if needed 
+            </Route> */}
+
+            <Route path='/' element={<Layout/>} />
             
             {/* Standalone routes outside of Layout */}
             <Route path='/bmi' element={<BMICalculator />} />

@@ -1,25 +1,31 @@
 import React from 'react'
 import Header from './components/Header'
+import FeaturesSection from './components/FeaturesSection';
+import Footer from './components/Footer';
+import Navbar from './components/Navbar';
+
 //import Recipes from '../components/Recipes'
 
-const Landing = () => {
-  return (
-    <main className='w-full flex flex-col'>
-      <Header
-        title={
-          <p>
-            Taste the World with
-            <br /> FlavorVerse!
-          </p>
-        }
-        type='home'
-      />
 
-      <section id="recipes" className='md:max-w-[1440px] mx-auto px-4 md:px-20'>
-         {/* <Recipes /> */}
-      </section>
-    </main>
-  )
-}
+const Landing = () => {
+    return (
+        <div className='w-full min-h-screen'>
+            <Navbar />
+            <Header
+                title={
+                    <span>
+                        Taste the World with
+                        <br /> 
+                        <span className='text-green-400'>FlavorVerse!</span>
+                    </span>
+                }
+                type='home'
+            />
+            <FeaturesSection />
+            <Footer />
+        </div>
+    );
+};
+
 
 export default Landing

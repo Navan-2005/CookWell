@@ -1,369 +1,96 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, Mic, MicOff, Upload, Clock, Users, Star, ChefHat, Send, Bot, User, Camera, X, Heart, Bookmark, Save } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, Mic, MicOff, Upload, Camera, ArrowLeft, Send, Bot, User, ChefHat, Clock, Users, Star, Sparkles, Image, Zap } from 'lucide-react';
 
-const RecipeChatBot = () => {
-  const [currentPage, setCurrentPage] = useState('chat');
+const RecipeSearchApp = () => {
+  const [currentPage, setCurrentPage] = useState('search');
   const [searchQuery, setSearchQuery] = useState('');
   const [isListening, setIsListening] = useState(false);
-  const [recognition, setRecognition] = useState(null);
-  const [messages, setMessages] = useState([
+  const [chatMessages, setChatMessages] = useState([
     {
-      id: 1,
       type: 'bot',
-      content: "Hi! I'm your Recipe Assistant. Ask me about any dish you'd like to cook, or try voice search!",
+      content: "👋 Hi there! I'm your Recipe Assistant. I can help you find delicious recipes using text, voice, or even images! What would you like to cook today?",
       timestamp: new Date()
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
-  const [currentRecipe, setCurrentRecipe] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [user, setUser] = useState({ _id: 'user123' }); // Mock user - replace with actual user from Redux
-  const messagesEndRef = useRef(null);
-  const textareaRef = useRef(null);
-
-  // Mock recipe database
-  const recipeDatabase = [
-    {
-      id: 1,
-      title: "Classic Spaghetti Carbonara",
-      image: "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=400&h=300&fit=crop",
-      cookTime: "20 min",
-      servings: 4,
-      rating: 4.8,
-      difficulty: "Medium",
-      cuisine: "Italian",
-      ingredients: [
-        "400g spaghetti pasta",
-        "200g pancetta or guanciale",
-        "4 large egg yolks",
-        "100g Pecorino Romano cheese",
-        "Fresh black pepper",
-        "Salt to taste"
-      ],
-      instructions: [
-        "Bring a large pot of salted water to boil and cook spaghetti according to package directions",
-        "While pasta cooks, cut pancetta into small cubes and cook in a large pan until crispy",
-        "In a bowl, whisk together egg yolks, grated cheese, and black pepper",
-        "Drain pasta, reserving 1 cup pasta water",
-        "Add hot pasta to pan with pancetta, remove from heat",
-        "Quickly mix in egg mixture, adding pasta water gradually until creamy",
-        "Serve immediately with extra cheese and pepper"
-      ],
-      description: "A classic Roman pasta dish with a silky, creamy sauce made from eggs, cheese, and crispy pancetta.",
-      tags: ["pasta", "italian", "quick", "dinner"]
-    },
-    {
-      id: 2,
-      title: "Chicken Tikka Masala",
-      image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop",
-      cookTime: "45 min",
-      servings: 6,
-      rating: 4.7,
-      difficulty: "Medium",
-      cuisine: "Indian",
-      ingredients: [
-        "1kg chicken breast, cubed",
-        "400ml coconut milk",
-        "400g canned tomatoes",
-        "2 large onions, diced",
-        "4 cloves garlic, minced",
-        "2 tbsp garam masala",
-        "1 tbsp ginger paste",
-        "2 tsp cumin",
-        "1 tsp turmeric",
-        "1 tsp paprika",
-        "Salt and pepper",
-        "Fresh cilantro",
-        "Basmati rice for serving"
-      ],
-      instructions: [
-        "Marinate chicken with yogurt, half the spices, and salt for 30 minutes",
-        "Cook marinated chicken in a pan until golden, set aside",
-        "Sauté onions until golden, add garlic and ginger",
-        "Add remaining spices and cook until fragrant",
-        "Add tomatoes and simmer for 10 minutes",
-        "Stir in coconut milk and cooked chicken",
-        "Simmer for 15-20 minutes until sauce thickens",
-        "Garnish with cilantro and serve with rice"
-      ],
-      description: "Tender chicken in a rich, creamy tomato-based curry with aromatic Indian spices.",
-      tags: ["chicken", "curry", "indian", "spicy", "dinner"]
-    }
-  ];
+  const [imageFile, setImageFile] = useState(null);
+  const [voiceSupported, setVoiceSupported] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+  
+  const recognitionRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const chatEndRef = useRef(null);
 
   // Initialize speech recognition
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognitionInstance = new SpeechRecognition();
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'en-US';
       
-      recognitionInstance.continuous = false;
-      recognitionInstance.interimResults = false;
-      recognitionInstance.lang = 'en-US';
-
-      recognitionInstance.onstart = () => {
-        console.log("Voice recognition started. Speak into the mic.");
-      };
-
-      recognitionInstance.onresult = (event) => {
-        const transcript = event.results[0][0].transcript.trim();
-        console.log("Recognized:", transcript);
+      recognitionRef.current.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
         setSearchQuery(transcript);
-        setIsListening(false);
-        if (transcript) {
-          handleSendMessage(transcript);
-        }
+        handleSearch(transcript);
       };
-
-      recognitionInstance.onspeechend = () => {
-        console.log("Speech ended");
-        recognitionInstance.stop();
-      };
-
-      recognitionInstance.onerror = (event) => {
-        console.error("Recognition error:", event.error);
+      
+      recognitionRef.current.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
         setIsListening(false);
       };
-
-      recognitionInstance.onend = () => {
-        console.log("Recognition ended");
+      
+      recognitionRef.current.onend = () => {
         setIsListening(false);
       };
-
-      setRecognition(recognitionInstance);
+      
+      setVoiceSupported(true);
     }
   }, []);
 
-  // Auto-scroll to bottom of messages
+  // Auto-scroll chat
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
 
-  // Auto-resize textarea based on content
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [searchQuery]);
-
-  const startListening = () => {
-    if (recognition) {
-      setIsListening(true);
-      recognition.start();
-    }
-  };
-
-  const stopListening = () => {
-    if (recognition) {
-      recognition.stop();
+  const toggleVoiceInput = () => {
+    if (!voiceSupported) return;
+    
+    if (isListening) {
+      recognitionRef.current.stop();
       setIsListening(false);
-    }
-  };
-
-  // Backend API call for recipe generation
-  const getRecipeFromBackend = async (prompt) => {
-    try {
-      const response = await fetch('http://localhost:3000/ai/get-recipe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to get recipe from backend');
-      }
-      
-      const data = await response.json();
-      return data.recipe;
-    } catch (error) {
-      console.error('Error fetching recipe:', error);
-      throw error;
-    }
-  };
-
-  const parseRecipe = (recipeText) => {
-    const lines = recipeText.split('\n');
-    
-    // Assume first line is title
-    const title = lines[0].trim();
-    
-    // Find ingredients section
-    const ingredientsStart = lines.findIndex(line => 
-      line.toLowerCase().includes('ingredients') || line.toLowerCase().includes('ingredient')
-    );
-    
-    // Find steps/instructions section
-    const stepsStart = lines.findIndex(line => 
-      line.toLowerCase().includes('instructions') || 
-      line.toLowerCase().includes('steps') || 
-      line.toLowerCase().includes('method')
-    );
-
-    // Extract ingredients
-    const ingredients = ingredientsStart !== -1 && stepsStart !== -1
-      ? lines.slice(ingredientsStart + 1, stepsStart)
-        .filter(line => line.trim() !== '')
-        .map(line => line.trim())
-      : [];
-
-    // Extract steps
-    const steps = stepsStart !== -1
-      ? lines.slice(stepsStart + 1)
-        .filter(line => line.trim() !== '')
-        .map(line => line.trim())
-      : [];
-
-    return {
-      userId: user._id,
-      title,
-      ingredients,
-      steps,
-      image: '',
-    };
-  };
-
-  const handleSaveRecipe = async (recipeText) => {
-    if (!recipeText) {
-      alert('No recipe to save');
-      return;
-    }
-
-    try {
-      const parsedRecipe = parseRecipe(recipeText);
-      console.log('Parsed recipe:', parsedRecipe);
-      
-      const response = await fetch('http://localhost:3000/user/saverecipe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(parsedRecipe),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save recipe');
-      }
-
-      const data = await response.json();
-      console.log('Recipe saved:', data);
-      alert('Recipe saved successfully!');
-      setCurrentRecipe(null);
-    } catch (error) {
-      console.error('Error saving recipe:', error);
-      alert('Failed to save recipe. Please try again.');
-    }
-  };
-
-  const findRecipes = (query) => {
-    const searchTerms = query.toLowerCase().split(' ');
-    return recipeDatabase.filter(recipe => {
-      const searchableText = [
-        recipe.title,
-        recipe.description,
-        recipe.cuisine,
-        ...recipe.ingredients,
-        ...recipe.tags
-      ].join(' ').toLowerCase();
-
-      return searchTerms.some(term => searchableText.includes(term));
-    });
-  };
-
-  const generateBotResponse = async (userMessage) => {
-    try {
-      // First try to get recipe from backend
-      setIsLoading(true);
-      const backendRecipe = await getRecipeFromBackend(userMessage);
-      
-      if (backendRecipe) {
-        setCurrentRecipe(backendRecipe);
-        return {
-          type: 'ai-recipe',
-          content: backendRecipe,
-          canSave: true
-        };
-      }
-    } catch (error) {
-      console.error('Backend request failed, falling back to local search:', error);
-    } finally {
-      setIsLoading(false);
-    }
-
-    // Fallback to local recipe search
-    const foundRecipes = findRecipes(userMessage);
-    
-    if (foundRecipes.length > 0) {
-      return {
-        type: 'recipes',
-        content: `I found ${foundRecipes.length} recipe${foundRecipes.length > 1 ? 's' : ''} for you!`,
-        recipes: foundRecipes.slice(0, 3)
-      };
     } else {
-      const suggestions = [
-        "Try searching for 'pasta', 'chicken', 'cookies', or 'breakfast'",
-        "I can help you find recipes by ingredients like 'tomato', 'cheese', or 'chocolate'",
-        "Ask me about specific cuisines like 'Italian', 'Indian', or 'American' dishes"
-      ];
-      
-      return {
-        type: 'text',
-        content: `I couldn't find any recipes matching "${userMessage}". ${suggestions[Math.floor(Math.random() * suggestions.length)]}`
-      };
+      recognitionRef.current.start();
+      setIsListening(true);
     }
   };
 
-  const handleSendMessage = async (message = searchQuery) => {
-    if (!message.trim()) return;
-
-    // Add user message
-    const userMessage = {
-      id: Date.now(),
-      type: 'user',
-      content: message,
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setSearchQuery('');
-    setIsTyping(true);
-
-    try {
-      const botResponse = await generateBotResponse(message);
-      const botMessage = {
-        id: Date.now() + 1,
-        type: 'bot',
-        ...botResponse,
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, botMessage]);
-    } catch (error) {
-      const errorMessage = {
-        id: Date.now() + 1,
-        type: 'bot',
-        content: 'Sorry, I encountered an error processing your request.',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsTyping(false);
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleImageUpload({ target: { files: e.dataTransfer.files } });
     }
   };
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
-    if (file) {
+    if (file && file.type.startsWith('image/')) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         setUploadedImage(e.target.result);
@@ -372,342 +99,496 @@ const RecipeChatBot = () => {
     }
   };
 
-  const analyzeImage = () => {
-    if (!uploadedImage) return;
-
-    const userMessage = {
-      id: Date.now(),
-      type: 'user',
-      content: 'I uploaded a food image for analysis',
-      image: uploadedImage,
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setCurrentPage('chat');
-    setIsTyping(true);
-
-    setTimeout(() => {
-      const randomRecipe = recipeDatabase[Math.floor(Math.random() * recipeDatabase.length)];
-      const botMessage = {
-        id: Date.now() + 1,
-        type: 'bot',
-        content: `Based on your image, I think you might be interested in this recipe!`,
-        recipes: [randomRecipe],
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, botMessage]);
-      setIsTyping(false);
-      setUploadedImage(null);
-    }, 2000);
+  const simulateRecipeSearch = async (query) => {
+    const recipes = [
+      { 
+        name: "Creamy Pasta Carbonara", 
+        time: "20 mins", 
+        difficulty: "Easy", 
+        servings: 4,
+        rating: 4.8,
+        ingredients: ["spaghetti", "eggs", "pancetta", "parmesan", "black pepper"],
+        description: "A classic Italian pasta dish with creamy egg sauce and crispy pancetta."
+      },
+      { 
+        name: "Spicy Chicken Curry", 
+        time: "45 mins", 
+        difficulty: "Medium", 
+        servings: 6,
+        rating: 4.6,
+        ingredients: ["chicken thighs", "coconut milk", "curry powder", "onions", "garlic", "ginger"],
+        description: "Rich and aromatic curry with tender chicken in a spiced coconut sauce."
+      },
+      { 
+        name: "Decadent Chocolate Cake", 
+        time: "1 hour", 
+        difficulty: "Hard", 
+        servings: 8,
+        rating: 4.9,
+        ingredients: ["dark chocolate", "butter", "sugar", "eggs", "flour", "cocoa powder"],
+        description: "Moist and rich chocolate cake perfect for special occasions."
+      },
+      { 
+        name: "Fresh Greek Salad", 
+        time: "15 mins", 
+        difficulty: "Easy", 
+        servings: 4,
+        rating: 4.5,
+        ingredients: ["tomatoes", "cucumber", "red onion", "feta cheese", "olives", "olive oil"],
+        description: "Light and refreshing Mediterranean salad with fresh vegetables."
+      },
+      { 
+        name: "Beef Stir Fry", 
+        time: "25 mins", 
+        difficulty: "Medium", 
+        servings: 4,
+        rating: 4.7,
+        ingredients: ["beef strips", "mixed vegetables", "soy sauce", "garlic", "ginger", "sesame oil"],
+        description: "Quick and healthy stir fry with tender beef and crisp vegetables."
+      },
+      { 
+        name: "Mushroom Risotto", 
+        time: "35 mins", 
+        difficulty: "Medium", 
+        servings: 4,
+        rating: 4.4,
+        ingredients: ["arborio rice", "mushrooms", "white wine", "parmesan", "butter", "onions"],
+        description: "Creamy Italian rice dish with earthy mushrooms and rich cheese."
+      }
+    ];
+    
+    const filteredRecipes = recipes.filter(recipe => 
+      recipe.name.toLowerCase().includes(query.toLowerCase()) ||
+      recipe.ingredients.some(ingredient => ingredient.toLowerCase().includes(query.toLowerCase())) ||
+      recipe.description.toLowerCase().includes(query.toLowerCase())
+    );
+    
+    return filteredRecipes.length > 0 ? filteredRecipes : recipes.slice(0, 3);
   };
 
-  const RecipeCard = ({ recipe, isExpanded = false }) => (
-    <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300">
-      <div className="relative">
-        <img
-          src={recipe.image}
-          alt={recipe.title}
-          className="w-full h-48 object-cover"
-        />
-        <div className="absolute top-3 right-3 flex space-x-2">
-          <button className="p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors">
-            <Heart className="h-4 w-4 text-red-500" />
-          </button>
-          <button className="p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors">
-            <Bookmark className="h-4 w-4 text-blue-500" />
-          </button>
-        </div>
-        <div className="absolute bottom-3 left-3">
-          <span className="px-2 py-1 bg-black/70 text-white text-xs rounded-full">
-            {recipe.cuisine}
-          </span>
+  const simulateImageAnalysis = async (imageFile) => {
+    await new Promise(resolve => setTimeout(resolve, 2500));
+    
+    const possibleIngredients = [
+      "fresh tomatoes", "red onions", "garlic cloves", "chicken breast", "ground beef", 
+      "pasta", "mozzarella cheese", "fresh basil", "mixed vegetables", "whole wheat bread", 
+      "eggs", "milk", "flour", "bell peppers", "mushrooms", "spinach", "carrots"
+    ];
+    
+    const detectedIngredients = possibleIngredients.slice(0, Math.floor(Math.random() * 4) + 3);
+    return detectedIngredients;
+  };
+
+  const handleSearch = async (query = searchQuery) => {
+    if (!query.trim()) return;
+    
+    const userMessage = { type: 'user', content: query, timestamp: new Date() };
+    setChatMessages(prev => [...prev, userMessage]);
+    setIsTyping(true);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      const recipes = await simulateRecipeSearch(query);
+      const botMessage = {
+        type: 'bot',
+        content: `🍳 Found ${recipes.length} delicious recipes for "${query}" :`,
+        recipes: recipes,
+        timestamp: new Date()
+      };
+      
+      setChatMessages(prev => [...prev, botMessage]);
+      setIsTyping(false);
+    } catch (error) {
+      const errorMessage = {
+        type: 'bot',
+        content: '😅 Oops! Something went wrong while searching. Please try again.',
+        timestamp: new Date()
+      };
+      setChatMessages(prev => [...prev, errorMessage]);
+      setIsTyping(false);
+    }
+    
+    setSearchQuery('');
+  };
+
+  const handleImageSearch = async () => {
+    if (!imageFile) return;
+    
+    const userMessage = { 
+      type: 'user', 
+      content: 'Uploaded an image for recipe analysis 📸',
+      image: uploadedImage,
+      timestamp: new Date() 
+    };
+    setChatMessages(prev => [...prev, userMessage]);
+    setCurrentPage('search');
+    setIsTyping(true);
+    
+    try {
+      const ingredients = await simulateImageAnalysis(imageFile);
+      const recipes = await simulateRecipeSearch(ingredients.join(' '));
+      
+      const botMessage = {
+        type: 'bot',
+        content: `🔍 I can see ${ingredients.join(', ')} in your image! Here are some perfect recipe matches :`,
+        recipes: recipes,
+        timestamp: new Date()
+      };
+      
+      setChatMessages(prev => [...prev, botMessage]);
+      setIsTyping(false);
+    } catch (error) {
+      const errorMessage = {
+        type: 'bot',
+        content: '😅 I couldn\'t analyze the image properly. Please try uploading another one!',
+        timestamp: new Date()
+      };
+      setChatMessages(prev => [...prev, errorMessage]);
+      setIsTyping(false);
+    }
+    
+    setUploadedImage(null);
+    setImageFile(null);
+  };
+
+  const RecipeCard = ({ recipe }) => (
+    <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-orange-200">
+      <div className="flex justify-between items-start mb-3">
+        <h3 className="font-bold text-xl text-gray-800 leading-tight">{recipe.name}</h3>
+        <div className="flex items-center bg-yellow-100 px-2 py-1 rounded-full">
+          <Star className="w-4 h-4 text-yellow-500 fill-current mr-1" />
+          <span className="text-sm font-medium text-yellow-700">{recipe.rating}</span>
         </div>
       </div>
       
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-2">{recipe.title}</h3>
-        <p className="text-gray-600 mb-4 text-sm leading-relaxed">{recipe.description}</p>
-        
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-4 text-sm text-gray-500">
-            <div className="flex items-center">
-              <Clock className="h-4 w-4 mr-1" />
-              {recipe.cookTime}
-            </div>
-            <div className="flex items-center">
-              <Users className="h-4 w-4 mr-1" />
-              {recipe.servings}
-            </div>
-            <div className="flex items-center">
-              <ChefHat className="h-4 w-4 mr-1" />
-              {recipe.difficulty}
-            </div>
-          </div>
-          <div className="flex items-center">
-            <Star className="h-4 w-4 text-yellow-400 mr-1 fill-current" />
-            <span className="text-sm text-gray-600 font-medium">{recipe.rating}</span>
-          </div>
+      <p className="text-gray-600 mb-4 text-sm leading-relaxed">{recipe.description}</p>
+      
+      <div className="flex items-center justify-between mb-4 text-sm text-gray-500">
+        <div className="flex items-center">
+          <Clock className="w-4 h-4 mr-1" />
+          <span>{recipe.time}</span>
         </div>
-        
-        <div className="mb-4">
-          <h4 className="font-semibold text-gray-800 mb-2 text-sm">Key Ingredients:</h4>
-          <div className="flex flex-wrap gap-1">
-            {recipe.ingredients.slice(0, 4).map((ingredient, index) => (
-              <span key={index} className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
-                {ingredient.split(',')[0]}
-              </span>
-            ))}
-            {recipe.ingredients.length > 4 && (
-              <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                +{recipe.ingredients.length - 4} more
-              </span>
-            )}
-          </div>
+        <div className="flex items-center">
+          <Users className="w-4 h-4 mr-1" />
+          <span>{recipe.servings} servings</span>
         </div>
-        
-        <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-3 rounded-lg transition-all duration-300 font-medium">
-          View Full Recipe
-        </button>
+        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+          recipe.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
+          recipe.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+          'bg-red-100 text-red-800'
+        }`}>
+          {recipe.difficulty}
+        </span>
       </div>
+      
+      <div className="mb-4">
+        <p className="text-sm font-medium text-gray-700 mb-2">Key Ingredients:</p>
+        <div className="flex flex-wrap gap-2">
+          {recipe.ingredients.slice(0, 4).map((ingredient, index) => (
+            <span key={index} className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">
+              {ingredient}
+            </span>
+          ))}
+          {recipe.ingredients.length > 4 && (
+            <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
+              +{recipe.ingredients.length - 4} more
+            </span>
+          )}
+        </div>
+      </div>
+      
+      <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center">
+        <ChefHat className="w-4 h-4 mr-2" />
+        View Full Recipe
+      </button>
     </div>
   );
 
-  const ChatInterface = () => (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl mr-3">
-                <ChefHat className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-800">RecipeBot</h1>
-                <p className="text-sm text-gray-500">Your AI Cooking Assistant</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setCurrentPage('upload')}
-              className="flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
-            >
-              <Camera className="h-4 w-4 mr-2" />
-              Upload Image
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Chat Messages */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="space-y-6 mb-24">
-          {messages.map((message) => (
-            <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`flex items-start space-x-3 max-w-3xl ${message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                <div className={`p-2 rounded-full ${message.type === 'user' ? 'bg-blue-500' : 'bg-gradient-to-r from-orange-500 to-red-500'}`}>
-                  {message.type === 'user' ? 
-                    <User className="h-4 w-4 text-white" /> : 
-                    <Bot className="h-4 w-4 text-white" />
-                  }
+  if (currentPage === 'search') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50">
+        <div className="container mx-auto px-4 py-6">
+          <div className="max-w-4xl mx-auto">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-center mb-4">
+                <div className="bg-gradient-to-r from-orange-500 to-red-500 p-3 rounded-full">
+                  <ChefHat className="w-8 h-8 text-white" />
                 </div>
-                
-                <div className={`rounded-2xl px-4 py-3 ${message.type === 'user' ? 'bg-blue-500 text-white' : 'bg-white shadow-md border border-gray-100'}`}>
-                  {message.image && (
-                    <img src={message.image} alt="Uploaded food" className="w-48 h-32 object-cover rounded-lg mb-3" />
-                  )}
-                  
-                  <p className={`${message.type === 'user' ? 'text-white' : 'text-gray-800'} mb-2 whitespace-pre-wrap`}>
-                    {message.content}
-                  </p>
-                  
-                  {message.canSave && (
-                    <div className="mt-3 flex space-x-2">
-                      <button 
-                        onClick={() => handleSaveRecipe(message.content)}
-                        className="flex items-center text-sm bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 transition-colors"
-                      >
-                        <Save size={14} className="mr-1" /> Save Recipe
-                      </button>
+                <Sparkles className="w-6 h-6 text-yellow-500 ml-2" />
+              </div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-2">
+                Recipe ChatBot Assistant
+              </h1>
+              <p className="text-gray-600 text-lg">Discover amazing recipes through conversation, voice, or images</p>
+            </div>
+
+            {/* Chat Container */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-white/20">
+              {/* Chat Messages */}
+              <div className="h-96 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-white/50 to-white/30">
+                {chatMessages.map((message, index) => (
+                  <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
+                      message.type === 'user' 
+                        ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg' 
+                        : 'bg-white/90 text-gray-800 shadow-md border border-gray-100'
+                    }`}>
+                      <div className="flex items-center mb-2">
+                        {message.type === 'user' ? (
+                          <User className="w-4 h-4 mr-2" />
+                        ) : (
+                          <Bot className="w-4 h-4 mr-2 text-orange-500" />
+                        )}
+                        <span className="text-xs opacity-75">
+                          {message.timestamp.toLocaleTimeString()}
+                        </span>
+                      </div>
+                      <p className="leading-relaxed">{message.content}</p>
+                      {message.image && (
+                        <img src={message.image} alt="Uploaded" className="mt-3 max-w-full h-32 object-cover rounded-lg border-2 border-white/20" />
+                      )}
                     </div>
-                  )}
-                  
-                  {message.recipes && (
-                    <div className="mt-4 space-y-4">
-                      {message.recipes.map((recipe) => (
-                        <RecipeCard key={recipe.id} recipe={recipe} />
+                  </div>
+                ))}
+                
+                {/* Recipe Results */}
+                {chatMessages.map((message, index) => (
+                  message.recipes && (
+                    <div key={`recipes-${index}`} className="grid gap-4 md:grid-cols-2 mt-4">
+                      {message.recipes.map((recipe, recipeIndex) => (
+                        <RecipeCard key={recipeIndex} recipe={recipe} />
                       ))}
                     </div>
+                  )
+                ))}
+                
+                {isTyping && (
+                  <div className="flex justify-start">
+                    <div className="bg-white/90 px-4 py-3 rounded-2xl shadow-md border border-gray-100">
+                      <div className="flex items-center">
+                        <Bot className="w-4 h-4 mr-2 text-orange-500" />
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                          <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        </div>
+                        <span className="ml-2 text-sm text-gray-600">Searching recipes...</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div ref={chatEndRef} />
+              </div>
+
+              {/* Input Area */}
+              <div className="p-6 bg-white/90 backdrop-blur-sm border-t border-gray-100">
+                <div className="flex items-center space-x-3">
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Ask me about any recipe... (e.g., 'pasta dishes', 'healthy breakfast', 'quick dinner')"
+                      className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none text-lg text-gray-900 bg-white/50 backdrop-blur-sm"
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                    />
+                  </div>
+                  
+                  {voiceSupported && (
+                    <button
+                      onClick={toggleVoiceInput}
+                      className={`p-4 rounded-xl transition-all duration-200 ${
+                        isListening 
+                          ? 'bg-red-500 text-white shadow-lg animate-pulse' 
+                          : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg'
+                      }`}
+                      title="Voice Search"
+                    >
+                      {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                    </button>
                   )}
                   
-                  <div className={`text-xs mt-2 ${message.type === 'user' ? 'text-blue-100' : 'text-gray-400'}`}>
-                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  <button
+                    onClick={() => setCurrentPage('image')}
+                    className="p-4 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white rounded-xl transition-all duration-200 shadow-lg"
+                    title="Upload Image"
+                  >
+                    <Image className="w-5 h-5" />
+                  </button>
+                  
+                  <button
+                    onClick={() => handleSearch()}
+                    disabled={!searchQuery.trim()}
+                    className="px-6 py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 disabled:from-gray-300 disabled:to-gray-400 text-white rounded-xl transition-all duration-200 font-medium shadow-lg"
+                  >
+                    <Send className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                {isListening && (
+                  <div className="mt-4 text-center">
+                    <div className="inline-flex items-center text-red-500 bg-red-50 px-4 py-2 rounded-full">
+                      <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse mr-2"></div>
+                      <Zap className="w-4 h-4 mr-1" />
+                      Listening for your recipe request...
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
-          ))}
-          
-          {(isTyping || isLoading) && (
-            <div className="flex justify-start">
-              <div className="flex items-start space-x-3">
-                <div className="p-2 rounded-full bg-gradient-to-r from-orange-500 to-red-500">
-                  <Bot className="h-4 w-4 text-white" />
-                </div>
-                <div className="bg-white rounded-2xl px-4 py-3 shadow-md border border-gray-100">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Fixed Input Area */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center space-x-3">
-              <div className="flex-1 relative">
-                <textarea
-                  ref={textareaRef}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Ask me about any recipe... (e.g., 'How to make pasta?')"
-                  className="w-full px-4 py-3 pr-12 border text-gray-950 border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  // rows="1"
-                  style={{ minHeight: '44px', maxHeight: '120px' }}
-                  disabled={isLoading}
-                />
-                <button
-                  onClick={isListening ? stopListening : startListening}
-                  disabled={isLoading}
-                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-lg transition-colors ${
-                    isListening ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                </button>
-              </div>
-              
-              <button
-                onClick={() => handleSendMessage()}
-                disabled={!searchQuery.trim() || isLoading}
-                className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Send className="h-5 w-5" />
-              </button>
-            </div>
-            
-            {isListening && (
-              <div className="mt-3 text-center">
-                <div className="inline-flex items-center px-4 py-2 bg-red-100 text-red-700 rounded-full">
-                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-2"></div>
-                  Listening for your recipe request...
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 
-  const UploadPage = () => (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 p-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <button
-            onClick={() => setCurrentPage('chat')}
-            className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors mx-auto"
-          >
-            <X className="h-4 w-4 mr-2" />
-            Back to Chat
-          </button>
-          <div className="flex items-center justify-center mb-4">
-            <Camera className="h-8 w-8 text-purple-600 mr-2" />
-            <h1 className="text-3xl font-bold text-gray-800">Food Image Analysis</h1>
-          </div>
-          <p className="text-gray-600">Upload a photo of your food and I'll suggest recipes!</p>
-        </div>
+  if (currentPage === 'image') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-3xl mx-auto">
+            {/* Header */}
+            <div className="flex items-center mb-8">
+              <button
+                onClick={() => setCurrentPage('search')}
+                className="mr-4 p-3 hover:bg-white/20 rounded-xl transition-all duration-200 backdrop-blur-sm"
+              >
+                <ArrowLeft className="w-6 h-6 text-gray-700" />
+              </button>
+              <div className="flex items-center">
+                <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-full mr-4">
+                  <Camera className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    AI Recipe Vision
+                  </h1>
+                  <p className="text-gray-600 text-lg">Upload your food images for instant recipe magic ✨</p>
+                </div>
+              </div>
+            </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          {!uploadedImage ? (
-            <div className="border-2 border-dashed border-purple-300 rounded-xl p-12 text-center hover:border-purple-400 transition-colors">
-              <Upload className="h-16 w-16 text-purple-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">Drop your food image here</h3>
-              <p className="text-gray-500 mb-6">or click to browse from your device</p>
+            {/* Upload Area */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/20">
+              <div 
+                className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300 cursor-pointer ${
+                  dragActive 
+                    ? 'border-purple-500 bg-purple-50' 
+                    : uploadedImage 
+                      ? 'border-green-500 bg-green-50' 
+                      : 'border-gray-300 hover:border-purple-400 hover:bg-purple-50/50'
+                }`}
+                onClick={() => fileInputRef.current?.click()}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+              >
+                {uploadedImage ? (
+                  <div className="space-y-6">
+                    <div className="relative inline-block">
+                      <img 
+                        src={uploadedImage} 
+                        alt="Uploaded" 
+                        className="max-w-full h-80 object-cover rounded-2xl shadow-lg border-4 border-white"
+                      />
+                      <div className="absolute top-2 right-2 bg-green-500 text-white p-2 rounded-full">
+                        <Camera className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-bold text-green-700">Perfect! Image uploaded successfully</h3>
+                      <p className="text-gray-600">Your delicious image is ready for AI analysis</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="relative">
+                      <div className="w-24 h-24 mx-auto bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
+                        <Upload className="w-12 h-12 text-white" />
+                      </div>
+                      <div className="absolute top-0 right-1/2 transform translate-x-6 -translate-y-2">
+                        <Sparkles className="w-6 h-6 text-yellow-500" />
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="text-2xl font-bold text-gray-800">Drop your food image here</h3>
+                      <p className="text-gray-600 text-lg">
+                        Or click to browse your delicious photos
+                      </p>
+                      <div className="flex justify-center space-x-4 text-sm text-gray-500">
+                        <span className="bg-gray-100 px-3 py-1 rounded-full">JPG</span>
+                        <span className="bg-gray-100 px-3 py-1 rounded-full">PNG</span>
+                        <span className="bg-gray-100 px-3 py-1 rounded-full">WEBP</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
               <input
+                ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
                 className="hidden"
-                id="file-upload"
               />
-              <label
-                htmlFor="file-upload"
-                className="inline-block px-8 py-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-lg cursor-pointer transition-all duration-300 transform hover:scale-105"
-              >
-                Choose Image
-              </label>
+              
+              {uploadedImage && (
+                <div className="mt-8 flex justify-center space-x-4">
+                  <button
+                    onClick={() => {
+                      setUploadedImage(null);
+                      setImageFile(null);
+                    }}
+                    className="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
+                  >
+                    Remove Image
+                  </button>
+                  <button
+                    onClick={handleImageSearch}
+                    className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl transition-all duration-200 font-medium flex items-center shadow-lg"
+                  >
+                    <Zap className="w-5 h-5 mr-2" />
+                    Analyze & Find Recipes
+                  </button>
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="text-center">
-              <div className="relative inline-block mb-6">
-                <img
-                  src={uploadedImage}
-                  alt="Uploaded food"
-                  className="max-w-full h-64 object-cover rounded-xl shadow-lg"
-                />
-                <button
-                  onClick={() => setUploadedImage(null)}
-                  className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+
+            {/* Features */}
+            <div className="mt-12 grid md:grid-cols-3 gap-6">
+              <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Camera className="w-6 h-6 text-blue-600" />
+                </div>
+                <h3 className="font-bold text-gray-800 mb-2">Smart Recognition</h3>
+                <p className="text-sm text-gray-600">AI identifies ingredients from your photos</p>
               </div>
               
-              <div className="space-y-4">
-                <button
-                  onClick={analyzeImage}
-                  className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg transition-all duration-300 transform hover:scale-105 mr-4"
-                >
-                  Analyze & Get Recipes
-                </button>
-                
-                <div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    id="file-upload-new"
-                  />
-                  <label
-                    htmlFor="file-upload-new"
-                    className="inline-block px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg cursor-pointer transition-colors"
-                  >
-                    Choose Different Image
-                  </label>
+              <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ChefHat className="w-6 h-6 text-green-600" />
                 </div>
+                <h3 className="font-bold text-gray-800 mb-2">Perfect Matches</h3>
+                <p className="text-sm text-gray-600">Get recipes that match your ingredients</p>
+              </div>
+              
+              <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="w-6 h-6 text-purple-600" />
+                </div>
+                <h3 className="font-bold text-gray-800 mb-2">Instant Results</h3>
+                <p className="text-sm text-gray-600">Fast AI analysis with detailed suggestions</p>
               </div>
             </div>
-          )}
-          
-          <div className="mt-6 text-center text-sm text-gray-500">
-            <p>Supported formats: JPG, PNG, GIF • Max size: 10MB</p>
           </div>
         </div>
       </div>
-    </div>
-  );
-
-  return currentPage === 'chat' ? <ChatInterface /> : <UploadPage />;
+    );
+  }
 };
 
-export default RecipeChatBot;
+export default RecipeSearchApp;

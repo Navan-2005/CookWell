@@ -3,130 +3,65 @@ import { FaFacebook, FaTwitter, FaInstagram, FaYoutube } from "react-icons/fa";
 
 const Footer = () => {
     return (
-        <footer className="text-white py-20 bg_gradient ">
-            <div className="container mx-auto px-20 lg:px-20 py-20 flex flex-col gap-10 md:flex-row justify-between border-t border-slate-800">
-                <div className="flex">
-                    <p className="font-bold text-center">
-                        Flavor<span className="text-green-500 text-xl">Verse</span>
-                    </p>
-                </div>
+        <footer className="text-white py-20 bg-gradient-to-br from-gray-900 via-black to-gray-900">
+            <div className="max-w-7xl mx-auto px-6 md:px-20 lg:px-32">
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                    <div className="lg:col-span-2">
+                        <div className="flex items-center mb-6">
+                            <div className='w-12 h-12 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center mr-3'>
+                                <span className='text-white font-bold text-lg'>F</span>
+                            </div>
+                            <p className="font-bold text-2xl">
+                                Flavor<span className="text-green-400">Verse</span>
+                            </p>
+                        </div>
+                        <p className="text-gray-300 text-lg mb-6 max-w-md">
+                            Your passport to culinary adventures. Discover, cook, and share amazing recipes from around the world.
+                        </p>
+                        <div className="flex gap-4">
+                            <a href='#' className='bg-blue-600 p-3 rounded-full text-white hover:bg-blue-700 transition-colors hover:scale-110 transform'>
+                                <FaFacebook size={20} />
+                            </a>
+                            <a href='#' className='bg-pink-600 p-3 rounded-full text-white hover:bg-pink-700 transition-colors hover:scale-110 transform'>
+                                <FaInstagram size={20} />
+                            </a>
+                            <a href='#' className='bg-blue-400 p-3 rounded-full text-white hover:bg-blue-500 transition-colors hover:scale-110 transform'>
+                                <FaTwitter size={20} />
+                            </a>
+                            <a href='#' className='bg-red-600 p-3 rounded-full text-white hover:bg-red-700 transition-colors hover:scale-110 transform'>
+                                <FaYoutube size={20} />
+                            </a>
+                        </div>
+                    </div>
 
-                <div className="">
-                    <p>QUICK LINKS</p>
+                    <div>
+                        <h4 className="font-semibold text-lg mb-6 text-green-400">QUICK LINKS</h4>
+                        <div className="flex flex-col space-y-3">
+                            <a href='#' className='text-gray-300 hover:text-green-400 transition-colors'>Home</a>
+                            <a href='#' className='text-gray-300 hover:text-green-400 transition-colors'>About</a>
+                            <a href='#' className='text-gray-300 hover:text-green-400 transition-colors'>Recipes</a>
+                            <a href='#' className='text-gray-300 hover:text-green-400 transition-colors'>Contact</a>
+                            <a href='#' className='text-gray-300 hover:text-green-400 transition-colors'>Chefs</a>
+                        </div>
+                    </div>
 
-                    <div className="flex flex-col text-start mb-4 md:mb-0">
-                        <a
-                            href='#'
-                            className='block md:inline-block py-2 hover:text-gray-500'
-                        >
-                            Home
-                        </a>
-                        <a
-                            href='#'
-                            className='block md:inline-block py-2 hover:text-gray-500'
-                        >
-                            About
-                        </a>
-                        <a
-                            href='#'
-                            className='block md:inline-block py-2 hover:text-gray-500'
-                        >
-                            Services
-                        </a>
-                        <a
-                            href='#'
-                            className='block md:inline-block py-2 hover:text-gray-500'
-                        >
-                            Contact
-                        </a>
-                        <a
-                            href='#'
-                            className='block md:inline-block py-2 hover:text-gray-500'
-                        >
-                            Chiefs
-                        </a>
+                    <div>
+                        <h4 className="font-semibold text-lg mb-6 text-green-400">LEGAL</h4>
+                        <div className='flex flex-col space-y-3'>
+                            <a href='#' className='text-gray-300 hover:text-green-400 transition-colors'>Terms & Conditions</a>
+                            <a href='#' className='text-gray-300 hover:text-green-400 transition-colors'>Privacy Policy</a>
+                            <a href='#' className='text-gray-300 hover:text-green-400 transition-colors'>Cookie Policy</a>
+                            <a href='#' className='text-gray-300 hover:text-green-400 transition-colors'>License Agreement</a>
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <p>LEGAL</p>
-                    <div className='flex flex-col text-start mb-4 md:mb-0 text-[14px]'>
-                        <a
-                            href='#'
-                            className='block md:inline-block py-2 hover:text-gray-500'
-                        >
-                            Terms and Conditions
-                        </a>
-                        <a
-                            href='#'
-                            className='block md:inline-block py-2 hover:text-gray-500'
-                        >
-                            License Agreement
-                        </a>
-                        <a
-                            href='#'
-                            className='block md:inline-block py-2 hover:text-gray-500'
-                        >
-                            Privacy Policy
-                        </a>
-                        <a
-                            href='#'
-                            className='block md:inline-block py-2 hover:text-gray-500'
-                        >
-                            Copyright Information
-                        </a>
-                        <a
-                            href='#'
-                            className='block md:inline-block py-2 hover:text-gray-500'
-                        >
-                            Cookies Policy
-                        </a>
-                    </div>
+                <div className="border-t border-gray-800 pt-8 text-center">
+                    <p className="text-gray-400">© 2024 FlavorVerse. All rights reserved.</p>
                 </div>
-
-                <div className="flex flex-col">
-                    <p>SOCIAL MEDIA</p>
-                    <div className="flex mt-4 gap-3">
-                        <a
-                            href='#'
-                            className='bg-blue-600 p-1.5 rounded-sm text-white hover:text-gray-500 hover:scale-110'
-                        >
-                            <FaFacebook size={18} />
-                        </a>
-
-                        <a
-                            href='#'
-                            className='bg-pink-600 p-1.5 rounded-sm text-white hover:text-gray-500 hover:scale-110'
-                        >
-                            <FaInstagram size={18} />
-                        </a>
-                        <a
-                            href='#'
-                            className='bg-blue-600 p-1.5 rounded-sm text-white hover:text-gray-500 hover:scale-110'
-                        >
-                            <FaTwitter size={18} />
-                        </a>
-                        <a
-                            href='#'
-                            className='bg-red-600 p-1.5 rounded-sm text-white hover:scale-110'
-                        >
-                            <FaYoutube size={18} />
-                        </a>
-                    </div>
-
-                    {/* <Button
-                        title='Sign up'
-                        btnType='button'
-                        conteinerStyle='mt-10 md:block bg-transparent border border-white text-white hover:bg-white hover:text-black rounded-md min-w-[130px]'
-                    /> */}
-                </div>
-            </div>
-
-            <div className="flex items-center justify-center py-10">
-                <span className="text-gray-400 leading-10">CodeWave &copy; 2023</span>
             </div>
         </footer>
-    )
-}
+    );
+};
 
 export default Footer
