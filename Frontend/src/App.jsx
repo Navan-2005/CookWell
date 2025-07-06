@@ -19,6 +19,7 @@ import BMICalculator from './Pages/bmi.jsx'
 import DietForm from './Pages/DietForm.jsx'
 import Favorites from './Pages/Favorites.jsx'
 import RecipeDetails from './Pages/RecipeDetails.jsx'
+import RecipeChatBot from './chatbolt.jsx'
 
 // Layout component
 function Layout() {
@@ -47,7 +48,7 @@ function App() {
               <Route path='upload' element={<UploadImage />} />
               {/* Add more nested routes here if needed */}
             </Route>
-
+            
             {/* Standalone routes outside of Layout */}
             <Route path='/bmi' element={<BMICalculator />} />
             <Route path='/diet' element={<DietForm/>} />
@@ -55,6 +56,7 @@ function App() {
             <Route path='/register' element={<Register />} />
             <Route path='/favorites' element={<Favorites />} />
             <Route path='/recipe/:recipeId' element={<RecipeDetails/>}/>
+            <Route path='/chat' element={<RecipeChatBot/>}/>
           </Routes>
         </div>
       </BrowserRouter>

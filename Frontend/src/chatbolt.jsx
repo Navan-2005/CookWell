@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Mic, MicOff, Upload, Clock, Users, Star, ChefHat, Send, Bot, User, Camera, X, Heart, Bookmark } from 'lucide-react';
+import { Search, Mic, MicOff, Upload, Clock, Users, Star, ChefHat, Send, Bot, User, Camera, X, Heart, Bookmark, Save } from 'lucide-react';
 
 const RecipeChatBot = () => {
   const [currentPage, setCurrentPage] = useState('chat');
@@ -16,7 +16,11 @@ const RecipeChatBot = () => {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
+  const [currentRecipe, setCurrentRecipe] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState({ _id: 'user123' }); // Mock user - replace with actual user from Redux
   const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
 
   // Mock recipe database
   const recipeDatabase = [
@@ -85,72 +89,6 @@ const RecipeChatBot = () => {
       ],
       description: "Tender chicken in a rich, creamy tomato-based curry with aromatic Indian spices.",
       tags: ["chicken", "curry", "indian", "spicy", "dinner"]
-    },
-    {
-      id: 3,
-      title: "Chocolate Chip Cookies",
-      image: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400&h=300&fit=crop",
-      cookTime: "25 min",
-      servings: 24,
-      rating: 4.9,
-      difficulty: "Easy",
-      cuisine: "American",
-      ingredients: [
-        "2¼ cups all-purpose flour",
-        "1 cup unsalted butter, softened",
-        "¾ cup brown sugar",
-        "½ cup granulated sugar",
-        "2 large eggs",
-        "2 tsp vanilla extract",
-        "1 tsp baking soda",
-        "1 tsp salt",
-        "2 cups chocolate chips"
-      ],
-      instructions: [
-        "Preheat oven to 375°F (190°C)",
-        "Cream together butter and both sugars until fluffy",
-        "Beat in eggs and vanilla extract",
-        "In separate bowl, whisk together flour, baking soda, and salt",
-        "Gradually mix dry ingredients into wet ingredients",
-        "Fold in chocolate chips",
-        "Drop rounded tablespoons of dough onto baking sheets",
-        "Bake for 9-11 minutes until golden brown",
-        "Cool on baking sheet for 5 minutes before transferring"
-      ],
-      description: "Soft, chewy cookies loaded with chocolate chips - a timeless favorite for all ages.",
-      tags: ["cookies", "dessert", "chocolate", "baking", "sweet"]
-    },
-    {
-      id: 4,
-      title: "Avocado Toast",
-      image: "https://images.unsplash.com/photo-1541519227354-08ea5b76cd61?w=400&h=300&fit=crop",
-      cookTime: "10 min",
-      servings: 2,
-      rating: 4.5,
-      difficulty: "Easy",
-      cuisine: "Modern",
-      ingredients: [
-        "2 slices sourdough bread",
-        "1 ripe avocado",
-        "1 lemon (juiced)",
-        "2 eggs (optional)",
-        "Cherry tomatoes",
-        "Red pepper flakes",
-        "Salt and pepper",
-        "Extra virgin olive oil"
-      ],
-      instructions: [
-        "Toast bread slices until golden brown",
-        "Mash avocado with lemon juice, salt, and pepper",
-        "Spread avocado mixture on toast",
-        "Top with sliced cherry tomatoes",
-        "If using eggs, fry or poach them",
-        "Place egg on top of avocado toast",
-        "Drizzle with olive oil and sprinkle red pepper flakes",
-        "Serve immediately"
-      ],
-      description: "A healthy and delicious breakfast or snack with creamy avocado on crispy toast.",
-      tags: ["breakfast", "healthy", "avocado", "quick", "vegetarian"]
     }
   ];
 
@@ -164,18 +102,32 @@ const RecipeChatBot = () => {
       recognitionInstance.interimResults = false;
       recognitionInstance.lang = 'en-US';
 
-      recognitionInstance.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        setSearchQuery(transcript);
-        setIsListening(false);
-        handleSendMessage(transcript);
+      recognitionInstance.onstart = () => {
+        console.log("Voice recognition started. Speak into the mic.");
       };
 
-      recognitionInstance.onerror = () => {
+      recognitionInstance.onresult = (event) => {
+        const transcript = event.results[0][0].transcript.trim();
+        console.log("Recognized:", transcript);
+        setSearchQuery(transcript);
+        setIsListening(false);
+        if (transcript) {
+          handleSendMessage(transcript);
+        }
+      };
+
+      recognitionInstance.onspeechend = () => {
+        console.log("Speech ended");
+        recognitionInstance.stop();
+      };
+
+      recognitionInstance.onerror = (event) => {
+        console.error("Recognition error:", event.error);
         setIsListening(false);
       };
 
       recognitionInstance.onend = () => {
+        console.log("Recognition ended");
         setIsListening(false);
       };
 
@@ -188,6 +140,14 @@ const RecipeChatBot = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Auto-resize textarea based on content
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [searchQuery]);
+
   const startListening = () => {
     if (recognition) {
       setIsListening(true);
@@ -199,6 +159,102 @@ const RecipeChatBot = () => {
     if (recognition) {
       recognition.stop();
       setIsListening(false);
+    }
+  };
+
+  // Backend API call for recipe generation
+  const getRecipeFromBackend = async (prompt) => {
+    try {
+      const response = await fetch('http://localhost:3000/ai/get-recipe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get recipe from backend');
+      }
+      
+      const data = await response.json();
+      return data.recipe;
+    } catch (error) {
+      console.error('Error fetching recipe:', error);
+      throw error;
+    }
+  };
+
+  const parseRecipe = (recipeText) => {
+    const lines = recipeText.split('\n');
+    
+    // Assume first line is title
+    const title = lines[0].trim();
+    
+    // Find ingredients section
+    const ingredientsStart = lines.findIndex(line => 
+      line.toLowerCase().includes('ingredients') || line.toLowerCase().includes('ingredient')
+    );
+    
+    // Find steps/instructions section
+    const stepsStart = lines.findIndex(line => 
+      line.toLowerCase().includes('instructions') || 
+      line.toLowerCase().includes('steps') || 
+      line.toLowerCase().includes('method')
+    );
+
+    // Extract ingredients
+    const ingredients = ingredientsStart !== -1 && stepsStart !== -1
+      ? lines.slice(ingredientsStart + 1, stepsStart)
+        .filter(line => line.trim() !== '')
+        .map(line => line.trim())
+      : [];
+
+    // Extract steps
+    const steps = stepsStart !== -1
+      ? lines.slice(stepsStart + 1)
+        .filter(line => line.trim() !== '')
+        .map(line => line.trim())
+      : [];
+
+    return {
+      userId: user._id,
+      title,
+      ingredients,
+      steps,
+      image: '',
+    };
+  };
+
+  const handleSaveRecipe = async (recipeText) => {
+    if (!recipeText) {
+      alert('No recipe to save');
+      return;
+    }
+
+    try {
+      const parsedRecipe = parseRecipe(recipeText);
+      console.log('Parsed recipe:', parsedRecipe);
+      
+      const response = await fetch('http://localhost:3000/user/saverecipe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(parsedRecipe),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save recipe');
+      }
+
+      const data = await response.json();
+      console.log('Recipe saved:', data);
+      alert('Recipe saved successfully!');
+      setCurrentRecipe(null);
+    } catch (error) {
+      console.error('Error saving recipe:', error);
+      alert('Failed to save recipe. Please try again.');
     }
   };
 
@@ -217,14 +273,34 @@ const RecipeChatBot = () => {
     });
   };
 
-  const generateBotResponse = (userMessage) => {
+  const generateBotResponse = async (userMessage) => {
+    try {
+      // First try to get recipe from backend
+      setIsLoading(true);
+      const backendRecipe = await getRecipeFromBackend(userMessage);
+      
+      if (backendRecipe) {
+        setCurrentRecipe(backendRecipe);
+        return {
+          type: 'ai-recipe',
+          content: backendRecipe,
+          canSave: true
+        };
+      }
+    } catch (error) {
+      console.error('Backend request failed, falling back to local search:', error);
+    } finally {
+      setIsLoading(false);
+    }
+
+    // Fallback to local recipe search
     const foundRecipes = findRecipes(userMessage);
     
     if (foundRecipes.length > 0) {
       return {
         type: 'recipes',
-        content: I found ${foundRecipes.length} recipe${foundRecipes.length > 1 ? 's' : ''} for you!,
-        recipes: foundRecipes.slice(0, 3) // Show max 3 recipes
+        content: `I found ${foundRecipes.length} recipe${foundRecipes.length > 1 ? 's' : ''} for you!`,
+        recipes: foundRecipes.slice(0, 3)
       };
     } else {
       const suggestions = [
@@ -235,7 +311,7 @@ const RecipeChatBot = () => {
       
       return {
         type: 'text',
-        content: I couldn't find any recipes matching "${userMessage}". ${suggestions[Math.floor(Math.random() * suggestions.length)]}
+        content: `I couldn't find any recipes matching "${userMessage}". ${suggestions[Math.floor(Math.random() * suggestions.length)]}`
       };
     }
   };
@@ -255,9 +331,8 @@ const RecipeChatBot = () => {
     setSearchQuery('');
     setIsTyping(true);
 
-    // Simulate typing delay
-    setTimeout(() => {
-      const botResponse = generateBotResponse(message);
+    try {
+      const botResponse = await generateBotResponse(message);
       const botMessage = {
         id: Date.now() + 1,
         type: 'bot',
@@ -266,11 +341,20 @@ const RecipeChatBot = () => {
       };
 
       setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      const errorMessage = {
+        id: Date.now() + 1,
+        type: 'bot',
+        content: 'Sorry, I encountered an error processing your request.',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1000);
+    }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
@@ -304,12 +388,11 @@ const RecipeChatBot = () => {
     setIsTyping(true);
 
     setTimeout(() => {
-      // Mock image analysis - in real app, this would use AI/ML
       const randomRecipe = recipeDatabase[Math.floor(Math.random() * recipeDatabase.length)];
       const botMessage = {
         id: Date.now() + 1,
         type: 'bot',
-        content: Based on your image, I think you might be interested in this recipe!,
+        content: `Based on your image, I think you might be interested in this recipe!`,
         recipes: [randomRecipe],
         timestamp: new Date()
       };
@@ -421,23 +504,34 @@ const RecipeChatBot = () => {
       <div className="max-w-4xl mx-auto px-4 py-6">
         <div className="space-y-6 mb-24">
           {messages.map((message) => (
-            <div key={message.id} className={flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}}>
-              <div className={flex items-start space-x-3 max-w-3xl ${message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''}}>
-                <div className={p-2 rounded-full ${message.type === 'user' ? 'bg-blue-500' : 'bg-gradient-to-r from-orange-500 to-red-500'}}>
+            <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`flex items-start space-x-3 max-w-3xl ${message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                <div className={`p-2 rounded-full ${message.type === 'user' ? 'bg-blue-500' : 'bg-gradient-to-r from-orange-500 to-red-500'}`}>
                   {message.type === 'user' ? 
                     <User className="h-4 w-4 text-white" /> : 
                     <Bot className="h-4 w-4 text-white" />
                   }
                 </div>
                 
-                <div className={rounded-2xl px-4 py-3 ${message.type === 'user' ? 'bg-blue-500 text-white' : 'bg-white shadow-md border border-gray-100'}}>
+                <div className={`rounded-2xl px-4 py-3 ${message.type === 'user' ? 'bg-blue-500 text-white' : 'bg-white shadow-md border border-gray-100'}`}>
                   {message.image && (
                     <img src={message.image} alt="Uploaded food" className="w-48 h-32 object-cover rounded-lg mb-3" />
                   )}
                   
-                  <p className={${message.type === 'user' ? 'text-white' : 'text-gray-800'} mb-2}>
+                  <p className={`${message.type === 'user' ? 'text-white' : 'text-gray-800'} mb-2 whitespace-pre-wrap`}>
                     {message.content}
                   </p>
+                  
+                  {message.canSave && (
+                    <div className="mt-3 flex space-x-2">
+                      <button 
+                        onClick={() => handleSaveRecipe(message.content)}
+                        className="flex items-center text-sm bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 transition-colors"
+                      >
+                        <Save size={14} className="mr-1" /> Save Recipe
+                      </button>
+                    </div>
+                  )}
                   
                   {message.recipes && (
                     <div className="mt-4 space-y-4">
@@ -447,7 +541,7 @@ const RecipeChatBot = () => {
                     </div>
                   )}
                   
-                  <div className={text-xs mt-2 ${message.type === 'user' ? 'text-blue-100' : 'text-gray-400'}}>
+                  <div className={`text-xs mt-2 ${message.type === 'user' ? 'text-blue-100' : 'text-gray-400'}`}>
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
@@ -455,7 +549,7 @@ const RecipeChatBot = () => {
             </div>
           ))}
           
-          {isTyping && (
+          {(isTyping || isLoading) && (
             <div className="flex justify-start">
               <div className="flex items-start space-x-3">
                 <div className="p-2 rounded-full bg-gradient-to-r from-orange-500 to-red-500">
@@ -474,22 +568,28 @@ const RecipeChatBot = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Area */}
+        {/* Fixed Input Area */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center space-x-3">
               <div className="flex-1 relative">
                 <textarea
+                  ref={textareaRef}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyDown}
                   placeholder="Ask me about any recipe... (e.g., 'How to make pasta?')"
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  rows="1"
+                  className="w-full px-4 py-3 pr-12 border text-gray-950 border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  // rows="1"
+                  style={{ minHeight: '44px', maxHeight: '120px' }}
+                  disabled={isLoading}
                 />
                 <button
                   onClick={isListening ? stopListening : startListening}
-                  className={absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-lg transition-colors ${isListening ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}}
+                  disabled={isLoading}
+                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-lg transition-colors ${
+                    isListening ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                 </button>
@@ -497,7 +597,7 @@ const RecipeChatBot = () => {
               
               <button
                 onClick={() => handleSendMessage()}
-                disabled={!searchQuery.trim()}
+                disabled={!searchQuery.trim() || isLoading}
                 className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="h-5 w-5" />
