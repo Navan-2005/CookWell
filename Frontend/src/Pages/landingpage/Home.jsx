@@ -14,9 +14,9 @@ const Landing = () => {
             <Header
                 title={
                     <span>
-                        Taste the World with
+                        Taste the Food with
                         <br /> 
-                        <span className='text-green-400'>FlavorVerse!</span>
+                        <span className='text-green-400'>FooDeefy!</span>
                     </span>
                 }
                 type='home'

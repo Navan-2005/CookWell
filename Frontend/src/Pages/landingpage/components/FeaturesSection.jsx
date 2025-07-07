@@ -14,7 +14,7 @@ const FeaturesSection = () => (
         <div className='w-full px-4 md:px-8 lg:px-12 xl:px-16'>
             <div className='text-center mb-16'>
                 <h2 className='text-4xl md:text-5xl font-bold text-white mb-4'>
-                    Why Choose FlavorVerse?
+                    Why Choose FooDeefy?
                 </h2>
                 <p className='text-xl text-gray-300 max-w-3xl mx-auto'>
                     Discover what makes our platform the ultimate destination for food lovers

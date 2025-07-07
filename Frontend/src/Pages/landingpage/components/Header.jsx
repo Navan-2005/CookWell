@@ -41,7 +41,7 @@ const Header = ({ title, image, type }) => {
                 {type && (
                     <div className='max-w-4xl mx-auto'>
                         <p className='text-lg md:text-xl lg:text-2xl text-green-400 bg-black/60 backdrop-blur-sm px-8 py-6 rounded-2xl border border-green-400/30 shadow-2xl'>
-                            Welcome to FlavorVerse, your passport to culinary adventures!
+                            Welcome to FooDeefy, your passport to culinary adventures!
                             <br className='hidden md:block' /> 
                             Discover a treasure trove of delectable recipes from around the globe.
                         </p>

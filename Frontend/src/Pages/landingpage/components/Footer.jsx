@@ -12,7 +12,7 @@ const Footer = () => {
                                 <span className='text-white font-bold text-lg'>F</span>
                             </div>
                             <p className="font-bold text-2xl">
-                                Flavor<span className="text-green-400">Verse</span>
+                                FooD<span className="text-green-400">eefy</span>
                             </p>
                         </div>
                         <p className="text-gray-300 text-lg mb-6 max-w-md">

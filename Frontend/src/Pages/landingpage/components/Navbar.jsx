@@ -32,7 +32,7 @@ const Navbar = () => {
                     <div className='w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center mr-3'>
                         <span className='text-white font-bold text-lg'>F</span>
                     </div>
-                    Flavor<span className='text-green-400'>Verse</span>
+                    FooD<span className='text-green-400'>eefy</span>
                 </a>
 
                 <ul className='hidden lg:flex text-white gap-8 xl:gap-12 text-lg'>
