@@ -21,6 +21,7 @@ import Favorites from './Pages/Favorites.jsx'
 import RecipeDetails from './Pages/RecipeDetails.jsx'
 import RecipeChatBot from './chatbolt.jsx'
 import { Layout } from './Pages/Layout.jsx'
+import ContactForm from './components/ContactForm.jsx'
 
 // Layout component
 // function Layout() {
@@ -41,6 +42,7 @@ function App() {
     <Provider store={store}>
       <BrowserRouter>
         <div className='bg-black'>
+            <Navbar />
           <Routes>
             {/* Routes using shared Layout */}
             {/* <Route path='/' element={<Layout />}>
@@ -51,15 +53,21 @@ function App() {
             </Route> */}
 
             <Route path='/' element={<Layout/>} />
+            {/* <Route path='/bmi' element={<BMICalculator />} />
+            <Route path='/bmi' element={<BMICalculator />} /> */}
+            
+            <Route path='/bmi' element={<BMICalculator />}/>
             
             {/* Standalone routes outside of Layout */}
-            <Route path='/bmi' element={<BMICalculator />} />
+            {/* <Route path='/bmi' element={<BMICalculator />} /> */}
             <Route path='/diet' element={<DietForm/>} />
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
             <Route path='/favorites' element={<Favorites />} />
             <Route path='/recipe/:recipeId' element={<RecipeDetails/>}/>
             <Route path='/chat' element={<RecipeChatBot/>}/>
+            <Route path='/community' element={<Community/>}/>
+            <Route path='/contact' element ={<ContactForm/>}/>
           </Routes>
         </div>
       </BrowserRouter>

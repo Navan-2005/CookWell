@@ -2,8 +2,9 @@ const User=require('../models/User')
 const favourites=require('../models/favourites')
 const mongoose=require('mongoose');
 const nodemailer=require('nodemailer');
-const dotenv = require('dotenv');
-dotenv.config();
+// const dotenv = require('dotenv');
+// dotenv.config();
+require('dotenv').config();
 const createUser = async (req, res) => {
     try {
       const { username, email, password } = req.body;
@@ -96,7 +97,10 @@ const createUser = async (req, res) => {
     }
   }
 
-  const sendContactEmail = async (req, res) => {
+//   const nodemailer = require('nodemailer');
+// require('dotenv').config(); // <-- Make sure this is called early
+
+const sendContactEmail = async (req, res) => {
   const { name, email, message } = req.body;
 
   if (!name || !email || !message) {
@@ -105,23 +109,19 @@ const createUser = async (req, res) => {
 
   try {
     const transporter = nodemailer.createTransport({
-      service: 'gmail', // You can also use 'smtp.mailtrap.io', etc.
+      service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: 'mrunknown.2005.2027@gmail.com',
+        pass: 'mxscayqtduvwwoce',
       },
     });
 
     const mailOptions = {
       from: email,
-      to: process.env.EMAIL_USER,
+      to: 'mrunknown.2005.2027@gmail.com',
+      replyTo: 'mrunknown.2005.2027@gmail.com',
       subject: `Contact Form Submission from ${name}`,
-      text: `
-        Name: ${name}
-        Email: ${email}
-        Message:
-        ${message}
-      `,
+      text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}`,
     };
 
     await transporter.sendMail(mailOptions);
@@ -132,6 +132,7 @@ const createUser = async (req, res) => {
     res.status(500).json({ error: 'Failed to send email.' });
   }
 };
+
 
 const getfavourites=async(req,res)=>{
   const { userId } = req.body;
@@ -147,6 +148,8 @@ const getfavourites=async(req,res)=>{
   }
 }
 
+
+
   module.exports={
     createUser,
     getUsers,
@@ -154,5 +157,6 @@ const getfavourites=async(req,res)=>{
     getprofile,
     getallusers,
     save,
-    getfavourites
+    getfavourites,
+    sendContactEmail
   }

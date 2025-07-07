@@ -1,10 +1,15 @@
 import React,{useEffect,useState} from 'react'
 import { Banner1, Banner2, Banner3, Banner4, Banner5 } from "../../../assets/landingpageimages/images";
+import { useNavigate } from 'react-router-dom';
 
 const images = [Banner1, Banner2, Banner3, Banner4, Banner5];
 
+
 const Header = ({ title, image, type }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+const navigate=useNavigate();
+
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -45,7 +50,7 @@ const Header = ({ title, image, type }) => {
                             <br className='hidden md:block' /> 
                             Discover a treasure trove of delectable recipes from around the globe.
                         </p>
-                        <button className='mt-8 bg-gradient-to-r from-green-400 to-green-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-green-500 hover:to-green-700 transition-all duration-300 hover:scale-105 shadow-2xl'>
+                        <button onClick={() => navigate('/chat')}  className='mt-8 bg-gradient-to-r from-green-400 to-green-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-green-500 hover:to-green-700 transition-all duration-300 hover:scale-105 shadow-2xl'>
                             Start Exploring
                         </button>
                     </div>

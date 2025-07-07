@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useSelector,useDispatch } from 'react-redux';
 
 const ContactForm = () => {
+  const dispatch=useDispatch();
+  const {user}=useSelector(state=>state.user);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
     message: ''
   });
 
@@ -22,6 +23,14 @@ const ContactForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    const response=await axios.post('http://localhost:3000/user/contact',
+      {
+        name:user.username,
+        email:user.email,
+        message:formData.message
+      }
+    )
+    console.log('Response from mail : ',response);
     
     // Simulate form submission
     setTimeout(() => {
@@ -29,9 +38,6 @@ const ContactForm = () => {
       setSubmitMessage('Thank you! We\'ll get back to you soon.');
       // Reset form
       setFormData({
-        name: '',
-        email: '',
-        phone: '',
         message: ''
       });
       
@@ -70,55 +76,6 @@ const ContactForm = () => {
               )}
 
               <div className="space-y-6">
-                {/* Name Field */}
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder="Enter your name"
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
-                  />
-                </div>
-
-                {/* Email Field */}
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Email (optional)
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="Enter your email"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
-                  />
-                </div>
-
-                {/* Phone Field */}
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone No (+91)
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    placeholder="Enter your Phone no"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
-                  />
-                </div>
-
                 {/* Message Field */}
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
@@ -131,12 +88,13 @@ const ContactForm = () => {
                     onChange={handleInputChange}
                     placeholder="Enter your message"
                     rows="4"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 resize-vertical"
+                    className="w-full px-4 py-3 text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 resize-vertical"
                   ></textarea>
                 </div>
 
                 {/* Submit Button */}
                 <button
+                  onClick={handleSubmit}
                   type="submit"
                   disabled={isSubmitting}
                   className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-all duration-200 ${

@@ -43,8 +43,8 @@ const Navbar = () => {
                         </a>
                     </li>
                     <li>
-                        <a href="/#recipes" className='hover:text-green-400 transition-colors relative group'>
-                            Explore
+                        <a href="/diet" className='hover:text-green-400 transition-colors relative group'>
+                            Diet plan
                             <span className='absolute bottom-0 left-0 w-0 h-0.5 bg-green-400 transition-all duration-300 group-hover:w-full'></span>
                         </a>
                     </li>
@@ -55,8 +55,14 @@ const Navbar = () => {
                         </a>
                     </li>
                     <li>
-                        <a href="/about" className='hover:text-green-400 transition-colors relative group'>
-                            About
+                        <a href="/community" className='hover:text-green-400 transition-colors relative group'>
+                            Community
+                            <span className='absolute bottom-0 left-0 w-0 h-0.5 bg-green-400 transition-all duration-300 group-hover:w-full'></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/contact" className='hover:text-green-400 transition-colors relative group'>
+                            Contact
                             <span className='absolute bottom-0 left-0 w-0 h-0.5 bg-green-400 transition-all duration-300 group-hover:w-full'></span>
                         </a>
                     </li>
