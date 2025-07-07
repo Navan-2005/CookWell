@@ -1,73 +1,122 @@
-// src/pages/Register.js
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { registerUser } from '../redux/slices/authSlice';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { setUser } from '../redux/slices/userslice';
+import axios from 'axios';
 
 export default function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const handleSubmit = async(e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const response=await axios.post('http://localhost:3000/user/register',{username,email,password});
-    if(response.status===200)
-      {localStorage.setItem('token',response.data.token);
+    setLoading(true);
+
+    try {
+      const response = await axios.post('http://localhost:3000/user/register', {
+        username,
+        email,
+        password,
+      });
+
+      if (response.status === 200) {
+        localStorage.setItem('token', response.data.token);
         dispatch(setUser(response.data.user));
-        console.log(response.data.user);
-        navigate('/');}
-    dispatch(registerUser({ username, email, password }));
-    toast({
-          title: "Account created successfully",
+        dispatch(registerUser({ username, email, password }));
+
+        toast.success("Account created successfully", {
           description: "Welcome to our platform!",
         });
+
+        navigate('/');
+      }
+    } catch (error) {
+      toast.error("Registration failed", {
+        description: error.response?.data?.message || "Something went wrong.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow">
-      <h2 className="text-2xl font-semibold mb-4">Register</h2>
-      {/* {error && <p className="mb-4 text-red-600">{error}</p>} */}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          placeholder="Username"
-          className="w-full p-2 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-          autoComplete="username"
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full p-2 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          autoComplete="email"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full p-2 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          autoComplete="new-password"
-        />
-        <button
-          type="submit"
-          // disabled={loading}
-          className="w-full h-12 bg-green-600 text-white py-2 rounded hover:bg-green-700 disabled:opacity-50"
-        > submit
-          {/* {loading ? 'Registering...' : 'Register'} */}
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-20">
+      <div className="w-full max-w-2xl bg-white dark:bg-gray-800 p-12 rounded-lg shadow-xl">
+        <h2 className="text-4xl font-bold text-center text-gray-800 dark:text-white mb-10">
+          Create Your Account
+        </h2>
+
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div>
+            <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Username
+            </label>
+            <input
+              type="text"
+              placeholder="yourusername"
+              className="w-full px-6 py-3 border rounded-lg text-base bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              autoComplete="username"
+            />
+          </div>
+
+          <div>
+            <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              className="w-full px-6 py-3 border rounded-lg text-base bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+            />
+          </div>
+
+          <div>
+            <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              className="w-full px-6 py-3 border rounded-lg text-base bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="new-password"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full py-4 text-lg bg-green-600 text-white rounded-lg hover:bg-green-700 transition ${
+              loading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+          >
+            {loading ? 'Registering...' : 'Register'}
+          </button>
+        </form>
+
+        <p className="mt-10 text-center text-md text-gray-600 dark:text-gray-400">
+          Already have an account?{' '}
+          <Link to="/login" className="text-green-600 font-medium hover:underline">
+            Login here
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

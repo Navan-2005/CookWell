@@ -22,6 +22,7 @@ import RecipeDetails from './Pages/RecipeDetails.jsx'
 import RecipeChatBot from './chatbolt.jsx'
 import { Layout } from './Pages/Layout.jsx'
 import ContactForm from './components/ContactForm.jsx'
+import Wrapper from './Pages/Wrapper.jsx'
 
 // Layout component
 // function Layout() {
@@ -44,30 +45,16 @@ function App() {
         <div className='bg-black'>
             <Navbar />
           <Routes>
-            {/* Routes using shared Layout */}
-            {/* <Route path='/' element={<Layout />}>
-              <Route index element={<Landing />} />
-              <Route path='community' element={<Community />} />
-              <Route path='upload' element={<UploadImage />} />
-              {/* Add more nested routes here if needed 
-            </Route> */}
-
-            <Route path='/' element={<Layout/>} />
-            {/* <Route path='/bmi' element={<BMICalculator />} />
-            <Route path='/bmi' element={<BMICalculator />} /> */}
-            
+            <Route path='/' element={<Wrapper><Layout/></Wrapper>} />           
             <Route path='/bmi' element={<BMICalculator />}/>
-            
-            {/* Standalone routes outside of Layout */}
-            {/* <Route path='/bmi' element={<BMICalculator />} /> */}
-            <Route path='/diet' element={<DietForm/>} />
+            <Route path='/diet' element={<Wrapper><DietForm /></Wrapper>} />
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
-            <Route path='/favorites' element={<Favorites />} />
-            <Route path='/recipe/:recipeId' element={<RecipeDetails/>}/>
-            <Route path='/chat' element={<RecipeChatBot/>}/>
-            <Route path='/community' element={<Community/>}/>
-            <Route path='/contact' element ={<ContactForm/>}/>
+            <Route path='/favorites' element={<Wrapper><Favorites /></Wrapper>} />
+            <Route path='/recipe/:recipeId' element={<Wrapper><RecipeDetails /></Wrapper>}/>
+            <Route path='/chat' element={<Wrapper><RecipeChatBot /></Wrapper>}/>
+            <Route path='/community' element={<Wrapper><Community /></Wrapper>}/>
+            <Route path='/contact' element ={<Wrapper><ContactForm /></Wrapper>}/>
           </Routes>
         </div>
       </BrowserRouter>

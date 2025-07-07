@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { HiMenuAlt3 } from 'react-icons/hi';
 import { AiOutlineClose } from 'react-icons/ai';
+import { useNavigate } from 'react-router-dom';
 import { FaFacebook, FaTwitter, FaInstagram, FaYoutube, FaSearch, FaHeart, FaClock, FaUsers } from "react-icons/fa";
 
 // Mock banner images - replace with your actual images
@@ -16,6 +17,7 @@ const images = [Banner1, Banner2, Banner3, Banner4, Banner5];
 const Navbar = () => {
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -72,7 +74,7 @@ const Navbar = () => {
                     <button className='text-white hover:text-green-400 transition-colors'>
                         <FaSearch size={20} />
                     </button>
-                    <button className='bg-gradient-to-r from-green-400 to-green-600 text-white px-6 py-2 rounded-full hover:from-green-500 hover:to-green-700 transition-all duration-300 hover:scale-105 shadow-lg'>
+                    <button onClick={()=> navigate('/login')} className='bg-gradient-to-r from-green-400 to-green-600 text-white px-6 py-2 rounded-full hover:from-green-500 hover:to-green-700 transition-all duration-300 hover:scale-105 shadow-lg'>
                         Sign In
                     </button>
                 </div>
