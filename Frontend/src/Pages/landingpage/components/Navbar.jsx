@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { HiMenuAlt3 } from 'react-icons/hi';
 import { AiOutlineClose } from 'react-icons/ai';
+import { CiUser } from "react-icons/ci";
+
 import { useNavigate } from 'react-router-dom';
 import { FaFacebook, FaTwitter, FaInstagram, FaYoutube, FaSearch, FaHeart, FaClock, FaUsers } from "react-icons/fa";
 
@@ -71,8 +73,8 @@ const Navbar = () => {
                 </ul>
 
                 <div className='hidden lg:flex items-center gap-4'>
-                    <button className='text-white hover:text-green-400 transition-colors'>
-                        <FaSearch size={20} />
+                    <button onClick={()=> navigate('/profile')} className='text-white hover:text-green-400 transition-colors'>
+                        <CiUser size={20} />
                     </button>
                     <button onClick={()=> navigate('/login')} className='bg-gradient-to-r from-green-400 to-green-600 text-white px-6 py-2 rounded-full hover:from-green-500 hover:to-green-700 transition-all duration-300 hover:scale-105 shadow-lg'>
                         Sign In

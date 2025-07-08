@@ -200,40 +200,40 @@ const DietForm = () => {
       switch (contentItem.type) {
         case 'subheader':
           return (
-            <h4 className="text-lg font-semibold text-white mt-4 mb-2 flex items-center gap-2">
-              <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+            <h4 className="text-lg font-semibold text-gray-200 mt-4 mb-2 flex items-center gap-2">
+              <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
               {contentItem.text}
             </h4>
           );
         case 'day':
           return (
-            <div className="bg-gradient-to-r from-green-50 to-blue-50 p-3 rounded-lg my-3">
-              <h5 className="font-bold text-green-800 text-lg">{contentItem.text}</h5>
+            <div className="bg-gradient-to-r from-emerald-900 to-cyan-900 p-3 rounded-lg my-3">
+              <h5 className="font-bold text-emerald-300 text-lg">{contentItem.text}</h5>
             </div>
           );
         case 'meal':
           return (
-            <div className="bg-orange-50 p-3 rounded-lg my-2 border-l-4 border-orange-400">
-              <h6 className="font-semibold text-orange-800">{contentItem.text}</h6>
+            <div className="bg-orange-900 p-3 rounded-lg my-2 border-l-4 border-orange-400">
+              <h6 className="font-semibold text-orange-300">{contentItem.text}</h6>
             </div>
           );
         case 'bullet':
           return (
             <div className="ml-4 my-1 flex items-start gap-2">
-              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 flex-shrink-0"></div>
-              <span className="text-gray-700">{contentItem.text}</span>
+              <div className="w-1.5 h-1.5 bg-gray-500 rounded-full mt-2 flex-shrink-0"></div>
+              <span className="text-gray-300">{contentItem.text}</span>
             </div>
           );
         case 'numbered':
           return (
-            <div className="ml-4 my-1 text-gray-700">{contentItem.text}</div>
+            <div className="ml-4 my-1 text-gray-300">{contentItem.text}</div>
           );
         case 'text':
           return (
-            <p className="text-gray-700 my-2 leading-relaxed">{contentItem.text}</p>
+            <p className="text-gray-300 my-2 leading-relaxed">{contentItem.text}</p>
           );
         default:
-          return <p className="text-gray-700 my-2">{contentItem.text}</p>;
+          return <p className="text-gray-300 my-2">{contentItem.text}</p>;
       }
     };
 
@@ -250,16 +250,16 @@ const DietForm = () => {
     const sections = parseContent(plan);
 
     return (
-      <div className="max-w-6xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden">
+      <div className="max-w-6xl mx-auto bg-gray-900 shadow-2xl rounded-2xl overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 p-8 text-white">
+        <div className="bg-gradient-to-r from-gray-800 via-gray-900 to-black p-8 text-white">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-white/20 rounded-lg">
               <Sparkles className="w-8 h-8" />
             </div>
             <div>
               <h1 className="text-4xl font-bold">Your Personalized Diet Plan</h1>
-              <p className="text-lg text-white/90 mt-1">Scientifically crafted for your unique goals</p>
+              <p className="text-lg text-gray-300 mt-1">Scientifically crafted for your unique goals</p>
             </div>
           </div>
           
@@ -267,25 +267,25 @@ const DietForm = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
             <div className="bg-white/10 rounded-lg p-3 text-center">
               <div className="text-2xl font-bold">7</div>
-              <div className="text-sm text-white/80">Days Planned</div>
+              <div className="text-sm text-gray-400">Days Planned</div>
             </div>
             <div className="bg-white/10 rounded-lg p-3 text-center">
               <div className="text-2xl font-bold">Custom</div>
-              <div className="text-sm text-white/80">Nutrition</div>
+              <div className="text-sm text-gray-400">Nutrition</div>
             </div>
             <div className="bg-white/10 rounded-lg p-3 text-center">
               <div className="text-2xl font-bold">Balanced</div>
-              <div className="text-sm text-white/80">Macros</div>
+              <div className="text-sm text-gray-400">Macros</div>
             </div>
             <div className="bg-white/10 rounded-lg p-3 text-center">
               <div className="text-2xl font-bold">Goal-Based</div>
-              <div className="text-sm text-white/80">Approach</div>
+              <div className="text-sm text-gray-400">Approach</div>
             </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <div className="bg-gray-50 border-b border-gray-200 p-4">
+        <div className="bg-gray-800 border-b border-gray-700 p-4">
           <div className="flex flex-wrap gap-2">
             {sections.map((section, index) => (
               <button
@@ -293,8 +293,8 @@ const DietForm = () => {
                 onClick={() => toggleSection(index)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   expandedSections[index] 
-                    ? 'bg-indigo-100 text-indigo-700 border-2 border-indigo-300' 
-                    : 'bg-white text-white border-2 border-gray-200 hover:bg-gray-100'
+                    ? 'bg-indigo-900 text-indigo-300 border-2 border-indigo-600' 
+                    : 'bg-gray-700 text-gray-300 border-2 border-gray-600 hover:bg-gray-600'
                 }`}
               >
                 {section.title}
@@ -308,34 +308,34 @@ const DietForm = () => {
           {sections.map((section, index) => {
             const IconComponent = getSectionIcon(section.title);
             return (
-              <div key={index} className="border-2 border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div key={index} className="border-2 border-gray-700 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
                 <button
                   onClick={() => toggleSection(index)}
                   className={`w-full p-6 flex items-center justify-between transition-all duration-300 ${
                     expandedSections[index] 
-                      ? 'bg-gradient-to-r from-indigo-50 to-blue-50 border-b-2 border-indigo-200' 
-                      : 'bg-gray-50 hover:bg-gray-100'
+                      ? 'bg-gradient-to-r from-indigo-900 to-purple-900 border-b-2 border-indigo-600' 
+                      : 'bg-gray-800 hover:bg-gray-700'
                   }`}
                 >
                   <div className="flex items-center gap-4">
                     <div className={`p-3 rounded-lg ${
                       expandedSections[index] 
-                        ? 'bg-indigo-100 text-indigo-600' 
-                        : 'bg-white text-gray-600'
+                        ? 'bg-indigo-800 text-indigo-300' 
+                        : 'bg-gray-700 text-gray-300'
                     }`}>
                       <IconComponent className="w-6 h-6" />
                     </div>
-                    <h2 className="text-xl font-bold text-amber-300 text-left">{section.title}</h2>
+                    <h2 className="text-xl font-bold text-amber-400 text-left">{section.title}</h2>
                   </div>
                   <div className={`transform transition-transform duration-300 ${
                     expandedSections[index] ? 'rotate-180' : ''
                   }`}>
-                    <ChevronDown className="w-6 h-6 text-gray-600" />
+                    <ChevronDown className="w-6 h-6 text-gray-400" />
                   </div>
                 </button>
                 
                 {expandedSections[index] && (
-                  <div className="p-6 bg-white">
+                  <div className="p-6 bg-gray-900">
                     <div className="prose prose-sm max-w-none">
                       {section.content.map((item, contentIndex) => (
                         <div key={contentIndex}>
@@ -351,18 +351,18 @@ const DietForm = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 border-t-2 border-gray-200">
+        <div className="p-6 bg-gradient-to-r from-gray-800 to-gray-900 border-t-2 border-gray-700">
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={() => setDietPlan(null)}
-              className="flex-1 py-4 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2"
+              className="flex-1 py-4 px-6 bg-gradient-to-r from-indigo-700 to-purple-700 text-white rounded-xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2"
             >
               <Sparkles className="w-5 h-5" />
               Create New Plan
             </button>
             <button
               onClick={() => window.print()}
-              className="flex-1 py-4 px-6 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl hover:from-green-700 hover:to-blue-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2"
+              className="flex-1 py-4 px-6 bg-gradient-to-r from-emerald-700 to-cyan-700 text-white rounded-xl hover:from-emerald-600 hover:to-cyan-600 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2"
             >
               <FileText className="w-5 h-5" />
               Print Plan
@@ -375,7 +375,7 @@ const DietForm = () => {
                   // You could add a toast notification here
                 }
               }}
-              className="flex-1 py-4 px-6 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2"
+              className="flex-1 py-4 px-6 bg-gradient-to-r from-gray-700 to-gray-800 text-white rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2"
             >
               <FileText className="w-5 h-5" />
               Copy Text
@@ -443,11 +443,11 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
   // Loading State
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-        <div className="text-center bg-white p-8 rounded-2xl shadow-2xl">
-          <LoaderCircle className="w-20 h-20 text-indigo-600 animate-spin mx-auto mb-6" />
-          <h2 className="text-3xl font-bold text-gray-800 mb-3">Creating Your Perfect Diet Plan</h2>
-          <p className="text-gray-600 mb-4">Our AI is analyzing your profile and crafting a personalized nutrition plan...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+        <div className="text-center bg-gray-800 p-8 rounded-2xl shadow-2xl">
+          <LoaderCircle className="w-20 h-20 text-indigo-400 animate-spin mx-auto mb-6" />
+          <h2 className="text-3xl font-bold text-gray-200 mb-3">Creating Your Perfect Diet Plan</h2>
+          <p className="text-gray-400 mb-4">Our AI is analyzing your profile and crafting a personalized nutrition plan...</p>
           <div className="flex justify-center space-x-2">
             <div className="w-3 h-3 bg-indigo-500 rounded-full animate-bounce"></div>
             <div className="w-3 h-3 bg-indigo-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
@@ -461,13 +461,13 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
   // Error State
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4">
-        <div className="max-w-md w-full bg-white shadow-2xl rounded-2xl p-8 text-center">
-          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <AlertCircle className="w-10 h-10 text-red-600" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black px-4">
+        <div className="max-w-md w-full bg-gray-800 shadow-2xl rounded-2xl p-8 text-center">
+          <div className="w-20 h-20 bg-red-900 rounded-full flex items-center justify-center mx-auto mb-6">
+            <AlertCircle className="w-10 h-10 text-red-400" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Oops! Something went wrong</h2>
-          <p className="text-gray-600 mb-6 bg-gray-50 p-3 rounded-lg">{error}</p>
+          <h2 className="text-2xl font-bold text-gray-200 mb-4">Oops! Something went wrong</h2>
+          <p className="text-gray-400 mb-6 bg-gray-700 p-3 rounded-lg">{error}</p>
           <div className="space-y-3">
             <button
               onClick={() => {
@@ -480,7 +480,7 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
             </button>
             <button
               onClick={testWithSampleData}
-              className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-300 font-semibold"
+              className="w-full px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-300 font-semibold"
             >
               Test with Sample Data
             </button>
@@ -493,7 +493,7 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
   // Diet Plan Display
   if (dietPlan) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black px-4 py-8">
         <DietPlanDisplay plan={dietPlan} />
       </div>
     );
@@ -501,30 +501,30 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
 
   // Form Display
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4 py-8">
-      <div className="max-w-2xl w-full bg-white shadow-2xl rounded-2xl overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black px-4 py-8">
+      <div className="max-w-2xl w-full bg-gray-800 shadow-2xl rounded-2xl overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-white">
+        <div className="bg-gradient-to-r from-gray-700 to-gray-900 p-8 text-white">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-white/20 rounded-lg">
               <Sparkles className="w-8 h-8" />
             </div>
             <div>
               <h1 className="text-3xl font-bold">Personalized Diet Plan</h1>
-              <p className="text-indigo-100 mt-1">Tell us about yourself to get a customized nutrition plan</p>
+              <p className="text-gray-300 mt-1">Tell us about yourself to get a customized nutrition plan</p>
             </div>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-blue-50">
-          <div className="flex items-center justify-between text-sm text-gray-800 mb-3">
+        <div className="px-8 py-6 bg-gradient-to-r from-gray-700 to-gray-800">
+          <div className="flex items-center justify-between text-sm text-gray-300 mb-3">
             <span className="font-medium">Form Progress</span>
-            <span className="font-bold text-indigo-600">
+            <span className="font-bold text-indigo-400">
               {Math.round(((Object.values(formData).filter(v => v !== '').length) / 7) * 100)}%
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+          <div className="w-full bg-gray-600 rounded-full h-3 overflow-hidden">
             <div 
               className="bg-gradient-to-r from-indigo-500 to-purple-500 h-3 rounded-full transition-all duration-500 ease-out shadow-inner"
               style={{ width: `${((Object.values(formData).filter(v => v !== '').length) / 7) * 100}%` }}
@@ -539,8 +539,8 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
               const Icon = field.icon;
               return (
                 <div key={field.name} className="space-y-2">
-                  <label className="block text-gray-800 font-semibold flex items-center gap-2">
-                    <Icon className="w-4 h-4 text-indigo-600" />
+                  <label className="block text-gray-200 font-semibold flex items-center gap-2">
+                    <Icon className="w-4 h-4 text-indigo-400" />
                     {field.label}
                   </label>
                   
@@ -550,7 +550,7 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
                       value={formData[field.name]}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-300 hover:border-gray-400 text-gray-900 shadow-sm"
+                      className="w-full px-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-700 text-gray-200 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 transition-all duration-300 hover:border-gray-500 shadow-sm"
                     >
                       <option value="">Select {field.label}</option>
                       {field.options.map(option => (
@@ -567,7 +567,7 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
                       onChange={handleChange}
                       placeholder={field.placeholder}
                       required
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-300 hover:border-gray-400 text-gray-900 placeholder-gray-500 shadow-sm"
+                      className="w-full px-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-700 text-gray-200 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 transition-all duration-300 hover:border-gray-500 placeholder-gray-400 shadow-sm"
                     />
                   )}
                 </div>
@@ -583,7 +583,7 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
               className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg ${
                 isFormValid 
                   ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white hover:shadow-xl' 
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
               }`}
             >
               {isFormValid ? (
@@ -599,14 +599,14 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
             {/* Test button for debugging */}
             <button
               onClick={testWithSampleData}
-              className="w-full py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-300 text-sm font-medium"
+              className="w-full py-2 px-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-300 text-sm font-medium"
             >
               Test with Sample Data (Debug)
             </button>
           </div>
 
           <div className="text-center pt-4">
-            <p className="text-sm text-gray-700 bg-green-50 p-3 rounded-lg border border-green-200">
+            <p className="text-sm text-gray-300 bg-emerald-900 p-3 rounded-lg border border-emerald-700">
               🔒 Your information is secure and will only be used to create your personalized plan
             </p>
           </div>

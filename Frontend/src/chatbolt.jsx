@@ -1,6 +1,7 @@
 
     import React, { useState, useRef, useEffect } from 'react';
 import { Search, Mic, MicOff, Upload, Camera, ArrowLeft, Send, Bot, User, ChefHat, Clock, Users, Star, Sparkles, Image, Zap, Save, LogIn } from 'lucide-react';
+import axios from 'axios';
 
 const RecipeSearchApp = () => {
   const [currentPage, setCurrentPage] = useState('search');
@@ -273,36 +274,36 @@ const RecipeSearchApp = () => {
     setCurrentPage('search');
     setIsTyping(true);
     
-    try {
-      // For now, we'll use a simple prompt for image analysis
-      const imageAnalysisPrompt = "Give me a recipe based on common ingredients like chicken, vegetables, and pasta";
+    // try {
+    //   // For now, we'll use a simple prompt for image analysis
+    //   const imageAnalysisPrompt = "Give me a recipe based on common ingredients like chicken, vegetables, and pasta";
       
-      const response = await axios.post('http://localhost:3000/ai/get-recipe', {
-        prompt: imageAnalysisPrompt
-      });
+    //   const response = await axios.post('http://localhost:3000/ai/generate-recipe', {
+    //     ingredients:ingredients
+    //   });
 
-      const recipeText = response.data.recipe;
-      setCurrentRecipe(recipeText);
+    //   const recipeText = response.data.recipe;
+    //   setCurrentRecipe(recipeText);
       
-      const botMessage = {
-        type: 'bot',
-        content: `🔍 Based on your image, here's a perfect recipe suggestion:`,
-        recipe: recipeText,
-        timestamp: new Date()
-      };
+    //   const botMessage = {
+    //     type: 'bot',
+    //     content: `🔍 Based on your image, here's a perfect recipe suggestion:`,
+    //     recipe: recipeText,
+    //     timestamp: new Date()
+    //   };
       
-      setChatMessages(prev => [...prev, botMessage]);
-      setIsTyping(false);
-    } catch (error) {
-      console.error('Error analyzing image:', error);
-      const errorMessage = {
-        type: 'bot',
-        content: '😅 I couldn\'t analyze the image properly. Please try uploading another one!',
-        timestamp: new Date()
-      };
-      setChatMessages(prev => [...prev, errorMessage]);
-      setIsTyping(false);
-    }
+    //   setChatMessages(prev => [...prev, botMessage]);
+    //   setIsTyping(false);
+    // } catch (error) {
+    //   console.error('Error analyzing image:', error);
+    //   const errorMessage = {
+    //     type: 'bot',
+    //     content: '😅 I couldn\'t analyze the image properly. Please try uploading another one!',
+    //     timestamp: new Date()
+    //   };
+    //   setChatMessages(prev => [...prev, errorMessage]);
+    //   setIsTyping(false);
+    // }
     
     setUploadedImage(null);
     setImageFile(null);
