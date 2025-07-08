@@ -24,6 +24,8 @@ import { Layout } from './Pages/Layout.jsx'
 import ContactForm from './components/ContactForm.jsx'
 import Wrapper from './Pages/Wrapper.jsx'
 import ProfilePage from './Pages/Profile.jsx'
+import GroceryListApp from './Pages/GroceryList.jsx'
+import Groceries from './Pages/Groceries.jsx'
 
 // Layout component
 // function Layout() {
@@ -47,7 +49,7 @@ function App() {
         <div className='bg-black'>
             <Navbar />
           <Routes>
-            <Route path='/' element={<Wrapper><Layout/></Wrapper>} />           
+            <Route path='/' element={<Wrapper><Layout/></Wrapper>} />      
             <Route path='/bmi' element={<BMICalculator />}/>
             <Route path='/diet' element={<Wrapper><DietForm /></Wrapper>} />
             <Route path='/login' element={<Login />} />
@@ -58,6 +60,8 @@ function App() {
             <Route path='/community' element={<Wrapper><Community /></Wrapper>}/>
             <Route path='/contact' element ={<Wrapper><ContactForm /></Wrapper>}/>
             <Route path='/profile' element={<Wrapper><ProfilePage/></Wrapper>}/>
+            <Route path='/grocery' element={<Wrapper><GroceryListApp/></Wrapper>}/>
+            <Route path='/groceries' element={<Wrapper><Groceries/></Wrapper>}/>
           </Routes>
         </div>
       </BrowserRouter>

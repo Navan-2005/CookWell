@@ -21,6 +21,31 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    age:{
+        type: Number,
+    },
+    height:{
+        type: Number,
+    },
+    weight:{
+        type: Number,
+    },
+    gender:{
+        type: String,
+    },
+    activityLevel:{
+        type: String,
+    },
+    diet:{
+        type: String,
+    },
+    groceryList:{
+        type: [{
+            name: String,
+            quantity: Number
+        }],
+        default: []
+    }
 });
 
 userSchema.methods.generateAuthToken = function () {

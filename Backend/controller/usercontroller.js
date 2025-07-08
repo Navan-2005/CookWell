@@ -56,7 +56,15 @@ const createUser = async (req, res) => {
       res.status(400).json({ error: error.message });
     }
   }
-  const getprofile=async(req,res)=>{res.send(req.user);};
+  const getprofile=async(req,res)=>{
+    try {
+      const {userId}=req.body;
+      const user=await User.findById(userId);
+      res.status(200).json({user});
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  };
 
   const save =async(req,res)=>{
     try {
@@ -148,6 +156,63 @@ const getfavourites=async(req,res)=>{
   }
 }
 
+const updategrocery = async (req, res) => {
+  const { grocery, userId } = req.body;
+  console.log('grocery : ', grocery);
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ error: 'Invalid user ID format' });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (!user.groceryList) {
+      user.groceryList = [];
+    }
+
+    // Merge logic: update quantity if item already exists, else push
+    grocery.forEach((incomingItem) => {
+      const existingItem = user.groceryList.find(
+        (item) => item.name.toLowerCase() === incomingItem.name.toLowerCase()
+      );
+
+      if (existingItem) {
+        // Add quantities (parse as numbers)
+        const existingQty = parseFloat(existingItem.quantity) || 0;
+        const newQty = parseFloat(incomingItem.quantity) || 0;
+        existingItem.quantity = (existingQty + newQty).toString();
+      } else {
+        // Add as new item
+        user.groceryList.push(incomingItem);
+      }
+    });
+
+    await user.save();
+
+    res.status(200).json({ message: 'Grocery list updated successfully', groceryList: user.groceryList });
+  } catch (error) {
+    console.error('Error in updating grocery list:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const getallgrocery=async (req,res)=>{
+  const {userId}=req.body;
+  try {
+    const user=await User.findById(userId);
+    res.status(200).json({groceryList:user.groceryList});
+  } catch (error) {
+    console.log('Error in getting grocery list : ',error.message);
+    res.status(400).json({ error: error.message });
+  }
+}
+
+
+
 
 
   module.exports={
@@ -158,5 +223,7 @@ const getfavourites=async(req,res)=>{
     getallusers,
     save,
     getfavourites,
-    sendContactEmail
+    sendContactEmail,
+    updategrocery,
+    getallgrocery
   }

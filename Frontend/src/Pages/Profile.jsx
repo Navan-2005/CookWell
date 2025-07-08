@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { User, Scale, Ruler, Utensils } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 export default function ProfilePage() {
+  const {user}=useSelector(state=>state.user);
   const [profile, setProfile] = useState({
     name: '',
     age: '',
@@ -21,6 +24,21 @@ export default function ProfilePage() {
     weight: '',
     dietType: ''
   });
+
+  const getprofile=async()=>{
+    try {
+      const response=await axios.post('http://localhost:3000/user/profile',{
+        userId:user._id
+      })
+      console.log('response : ',response.data.user);
+    } catch (error) {
+      
+    }
+  }
+
+  useEffect(()=>{
+    getprofile();
+  })
 
   const handleSaveProfile = () => {
     // Validate all required fields
