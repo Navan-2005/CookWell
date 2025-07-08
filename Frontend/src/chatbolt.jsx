@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+
+    import React, { useState, useRef, useEffect } from 'react';
 import { Search, Mic, MicOff, Upload, Camera, ArrowLeft, Send, Bot, User, ChefHat, Clock, Users, Star, Sparkles, Image, Zap, Save, LogIn } from 'lucide-react';
-import { useSelector, useDispatch } from 'react-redux';
-import axios from 'axios';
 
 const RecipeSearchApp = () => {
   const [currentPage, setCurrentPage] = useState('search');
@@ -25,8 +24,7 @@ const RecipeSearchApp = () => {
   const fileInputRef = useRef(null);
   const chatEndRef = useRef(null);
 
-  const { user } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
+  const [user, setUser] = useState(null); // Mock user state
 
   // Initialize speech recognition
   useEffect(() => {
@@ -93,93 +91,63 @@ const RecipeSearchApp = () => {
     }
   };
 
-  // const handleImageUpload = async(event) => {
-  //   const file = event.target.files[0];
-  //   if (file && file.type.startsWith('image/')) {
-  //     setImageFile(file);
-  //     // const reader = new FileReader();
-  //     // reader.onload = (e) => {
-  //     //   setUploadedImage(e.target.result);
-  //     // };
-  //     // reader.readAsDataURL(file);
-  //     const form = new FormData();
-  //     form.append('image', file);
-  //     try {
-  //     const res = await axios.post("http://localhost:5001/detect", formData, {
-  //       headers: {
-  //         "Content-Type": "multipart/form-data",
-  //       },
-  //     });
-  //     console.log('Ingrredients : ',res.data.ingredients);
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      setImageFile(file);
       
-  //     const recipe=await axios.post("http://localhost:3000/ai/generate-recipe",{ingredients:res.data.ingredients});
-       
-  //     console.log('recipe : ',recipe.data.recipe);
-      
-  //      console.log('Recipe from Image : ',recipe.data.recipe);
-       
-  //     setCurrentRecipe(res.data.ingredients);
-  //   } catch (error) {
-  //     console.error("Upload failed:", error.response?.data || error.message);
-  //   }
-  //   }
-  // };
-const handleImageUpload = async (event) => {
-  const file = event.target.files[0];
-  if (file && file.type.startsWith('image/')) {
-    setImageFile(file);
-    
-    // Create image preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setUploadedImage(e.target.result);
-    };
-    reader.readAsDataURL(file);
-    
-    // Create FormData for upload
-    const formData = new FormData(); // Fixed: was 'form' instead of 'formData'
-    formData.append('image', file);
-    
-    try {
-      const res = await axios.post("http://localhost:5001/detect", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      console.log('Ingredients : ', res.data.ingredients);
-      
-      const recipe = await axios.post("http://localhost:3000/ai/generate-recipe", {
-        ingredients: res.data.ingredients
-      });
-       
-      console.log('Recipe : ', recipe.data.recipe);
-      
-      setCurrentRecipe(recipe.data.recipe);
-      
-      // Add success message to chat
-      const successMessage = {
-        type: 'bot',
-        content: `🔍 Successfully analyzed your image! Found ingredients: ${res.data.ingredients.join(', ')}`,
-        recipe: recipe.data.recipe,
-        timestamp: new Date()
+      // Create image preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploadedImage(e.target.result);
       };
-      setChatMessages(prev => [...prev, successMessage]);
+      reader.readAsDataURL(file);
       
-    } catch (error) {
-      console.error("Upload failed:", error.response?.data || error.message);
+      // Create FormData for upload
+      const formData = new FormData();
+      formData.append('image', file);
       
-      // Add error message to chat
-      const errorMessage = {
-        type: 'bot',
-        content: '😅 Sorry, I couldn\'t analyze the image. Please try again with a clearer food image.',
-        timestamp: new Date()
-      };
-      setChatMessages(prev => [...prev, errorMessage]);
+      try {
+        const res = await axios.post("http://localhost:5001/detect", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        console.log('Ingredients : ', res.data.ingredients);
+        
+        const recipe = await axios.post("http://localhost:3000/ai/generate-recipe", {
+          ingredients: res.data.ingredients
+        });
+         
+        console.log('Recipe : ', recipe.data.recipe);
+        
+        setCurrentRecipe(recipe.data.recipe);
+        
+        // Add success message to chat
+        const successMessage = {
+          type: 'bot',
+          content: `🔍 Successfully analyzed your image! Found ingredients: ${res.data.ingredients.join(', ')}`,
+          recipe: recipe.data.recipe,
+          timestamp: new Date()
+        };
+        setChatMessages(prev => [...prev, successMessage]);
+        
+      } catch (error) {
+        console.error("Upload failed:", error.response?.data || error.message);
+        
+        // Add error message to chat
+        const errorMessage = {
+          type: 'bot',
+          content: '😅 Sorry, I couldn\'t analyze the image. Please try again with a clearer food image.',
+          timestamp: new Date()
+        };
+        setChatMessages(prev => [...prev, errorMessage]);
+      }
+    } else {
+      alert('Please select a valid image file');
     }
-  } else {
-    alert('Please select a valid image file');
-  }
-};
+  };
+
   // Helper function to parse recipe text into structured format
   const parseRecipe = (recipeText) => {
     const lines = recipeText.split('\n');
@@ -307,8 +275,7 @@ const handleImageUpload = async (event) => {
     
     try {
       // For now, we'll use a simple prompt for image analysis
-      // In a real implementation, you'd send the image to your backend
-      // const imageAnalysisPrompt = "Give me a recipe based on common ingredients like chicken, vegetables, and pasta";
+      const imageAnalysisPrompt = "Give me a recipe based on common ingredients like chicken, vegetables, and pasta";
       
       const response = await axios.post('http://localhost:3000/ai/get-recipe', {
         prompt: imageAnalysisPrompt
@@ -346,13 +313,13 @@ const handleImageUpload = async (event) => {
     const title = lines[0].trim();
     
     return (
-      <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-orange-200 mt-4">
+      <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-700 hover:border-orange-500 mt-4">
         <div className="flex justify-between items-start mb-3">
-          <h3 className="font-bold text-xl text-gray-800 leading-tight">{title}</h3>
+          <h3 className="font-bold text-xl text-white leading-tight">{title}</h3>
           <div className="flex items-center space-x-2">
             <button
               onClick={() => onSave(recipe)}
-              className="flex items-center text-sm bg-green-500 text-white px-3 py-2 rounded-lg hover:bg-green-600 transition-colors"
+              className="flex items-center text-sm bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors"
             >
               <Save size={14} className="mr-1" />
               Save Recipe
@@ -361,7 +328,7 @@ const handleImageUpload = async (event) => {
         </div>
         
         <div className="prose prose-sm max-w-none">
-          <pre className="whitespace-pre-wrap text-gray-700 text-sm leading-relaxed font-sans">
+          <pre className="whitespace-pre-wrap text-gray-300 text-sm leading-relaxed font-sans">
             {recipe}
           </pre>
         </div>
@@ -376,7 +343,7 @@ const handleImageUpload = async (event) => {
 
   if (currentPage === 'search') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
         <div className="container mx-auto px-4 py-6">
           <div className="max-w-4xl mx-auto">
             {/* Header */}
@@ -385,30 +352,30 @@ const handleImageUpload = async (event) => {
                 <div className="bg-gradient-to-r from-orange-500 to-red-500 p-3 rounded-full">
                   <ChefHat className="w-8 h-8 text-white" />
                 </div>
-                <Sparkles className="w-6 h-6 text-yellow-500 ml-2" />
+                <Sparkles className="w-6 h-6 text-yellow-400 ml-2" />
               </div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-2">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent mb-2">
                 Recipe ChatBot Assistant
               </h1>
-              <p className="text-gray-600 text-lg">Discover amazing recipes through conversation, voice, or images</p>
+              <p className="text-gray-300 text-lg">Discover amazing recipes through conversation, voice, or images</p>
             </div>
 
             {/* Chat Container */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-white/20">
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-gray-700">
               {/* Chat Messages */}
-              <div className="h-96 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-white/50 to-white/30">
+              <div className="h-96 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-gray-900/80 to-gray-800/80">
                 {chatMessages.map((message, index) => (
                   <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
                       message.type === 'user' 
                         ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg' 
-                        : 'bg-white/90 text-gray-800 shadow-md border border-gray-100'
+                        : 'bg-gray-700/80 text-gray-100 shadow-md border border-gray-600'
                     }`}>
                       <div className="flex items-center mb-2">
                         {message.type === 'user' ? (
                           <User className="w-4 h-4 mr-2" />
                         ) : (
-                          <Bot className="w-4 h-4 mr-2 text-orange-500" />
+                          <Bot className="w-4 h-4 mr-2 text-orange-400" />
                         )}
                         <span className="text-xs opacity-75">
                           {message.timestamp.toLocaleTimeString()}
@@ -416,7 +383,7 @@ const handleImageUpload = async (event) => {
                       </div>
                       <p className="leading-relaxed">{message.content}</p>
                       {message.image && (
-                        <img src={message.image} alt="Uploaded" className="mt-3 max-w-full h-32 object-cover rounded-lg border-2 border-white/20" />
+                        <img src={message.image} alt="Uploaded" className="mt-3 max-w-full h-32 object-cover rounded-lg border-2 border-gray-600" />
                       )}
                     </div>
                   </div>
@@ -436,15 +403,15 @@ const handleImageUpload = async (event) => {
                 
                 {isTyping && (
                   <div className="flex justify-start">
-                    <div className="bg-white/90 px-4 py-3 rounded-2xl shadow-md border border-gray-100">
+                    <div className="bg-gray-700/80 px-4 py-3 rounded-2xl shadow-md border border-gray-600">
                       <div className="flex items-center">
-                        <Bot className="w-4 h-4 mr-2 text-orange-500" />
+                        <Bot className="w-4 h-4 mr-2 text-orange-400" />
                         <div className="flex space-x-1">
                           <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce"></div>
                           <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
                           <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                         </div>
-                        <span className="ml-2 text-sm text-gray-600">Getting your recipe...</span>
+                        <span className="ml-2 text-sm text-gray-300">Getting your recipe...</span>
                       </div>
                     </div>
                   </div>
@@ -453,7 +420,7 @@ const handleImageUpload = async (event) => {
               </div>
 
               {/* Input Area */}
-              <div className="p-6 bg-white/90 backdrop-blur-sm border-t border-gray-100">
+              <div className="p-6 bg-gray-800/90 backdrop-blur-sm border-t border-gray-700">
                 <div className="flex items-center space-x-3">
                   <div className="flex-1 relative">
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -462,7 +429,7 @@ const handleImageUpload = async (event) => {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Ask me about any recipe... (e.g., 'pasta dishes', 'healthy breakfast', 'quick dinner')"
-                      className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none text-lg text-gray-900 bg-white/50 backdrop-blur-sm"
+                      className="w-full pl-12 pr-4 py-4 border-2 border-gray-600 rounded-xl focus:border-orange-500 focus:outline-none text-lg text-white bg-gray-700/80 backdrop-blur-sm placeholder-gray-400"
                       onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                     />
                   </div>
@@ -492,7 +459,7 @@ const handleImageUpload = async (event) => {
                   <button
                     onClick={() => handleSearch()}
                     disabled={!searchQuery.trim()}
-                    className="px-6 py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 disabled:from-gray-300 disabled:to-gray-400 text-white rounded-xl transition-all duration-200 font-medium shadow-lg"
+                    className="px-6 py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-xl transition-all duration-200 font-medium shadow-lg"
                   >
                     <Send className="w-5 h-5" />
                   </button>
@@ -500,8 +467,8 @@ const handleImageUpload = async (event) => {
                 
                 {isListening && (
                   <div className="mt-4 text-center">
-                    <div className="inline-flex items-center text-red-500 bg-red-50 px-4 py-2 rounded-full">
-                      <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse mr-2"></div>
+                    <div className="inline-flex items-center text-red-400 bg-red-900/30 px-4 py-2 rounded-full border border-red-600">
+                      <div className="w-3 h-3 bg-red-400 rounded-full animate-pulse mr-2"></div>
                       <Zap className="w-4 h-4 mr-1" />
                       Listening for your recipe request...
                     </div>
@@ -517,39 +484,39 @@ const handleImageUpload = async (event) => {
 
   if (currentPage === 'image') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-3xl mx-auto">
             {/* Header */}
             <div className="flex items-center mb-8">
               <button
                 onClick={() => setCurrentPage('search')}
-                className="mr-4 p-3 hover:bg-white/20 rounded-xl transition-all duration-200 backdrop-blur-sm"
+                className="mr-4 p-3 hover:bg-gray-800/50 rounded-xl transition-all duration-200 backdrop-blur-sm"
               >
-                <ArrowLeft className="w-6 h-6 text-gray-700" />
+                <ArrowLeft className="w-6 h-6 text-gray-300" />
               </button>
               <div className="flex items-center">
                 <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-full mr-4">
                   <Camera className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                     AI Recipe Vision
                   </h1>
-                  <p className="text-gray-600 text-lg">Upload your food images for instant recipe magic ✨</p>
+                  <p className="text-gray-300 text-lg">Upload your food images for instant recipe magic ✨</p>
                 </div>
               </div>
             </div>
 
             {/* Upload Area */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/20">
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-gray-700">
               <div 
                 className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300 cursor-pointer ${
                   dragActive 
-                    ? 'border-purple-500 bg-purple-50' 
+                    ? 'border-purple-400 bg-purple-900/30' 
                     : uploadedImage 
-                      ? 'border-green-500 bg-green-50' 
-                      : 'border-gray-300 hover:border-purple-400 hover:bg-purple-50/50'
+                      ? 'border-green-400 bg-green-900/30' 
+                      : 'border-gray-500 hover:border-purple-400 hover:bg-purple-900/20'
                 }`}
                 onClick={() => fileInputRef.current?.click()}
                 onDragEnter={handleDrag}
@@ -563,15 +530,15 @@ const handleImageUpload = async (event) => {
                       <img 
                         src={uploadedImage} 
                         alt="Uploaded" 
-                        className="max-w-full h-80 object-cover rounded-2xl shadow-lg border-4 border-white"
+                        className="max-w-full h-80 object-cover rounded-2xl shadow-lg border-4 border-gray-600"
                       />
                       <div className="absolute top-2 right-2 bg-green-500 text-white p-2 rounded-full">
                         <Camera className="w-4 h-4" />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-xl font-bold text-green-700">Perfect! Image uploaded successfully</h3>
-                      <p className="text-gray-600">Your delicious image is ready for AI analysis</p>
+                      <h3 className="text-xl font-bold text-green-400">Perfect! Image uploaded successfully</h3>
+                      <p className="text-gray-300">Your delicious image is ready for AI analysis</p>
                     </div>
                   </div>
                 ) : (
@@ -581,18 +548,18 @@ const handleImageUpload = async (event) => {
                         <Upload className="w-12 h-12 text-white" />
                       </div>
                       <div className="absolute top-0 right-1/2 transform translate-x-6 -translate-y-2">
-                        <Sparkles className="w-6 h-6 text-yellow-500" />
+                        <Sparkles className="w-6 h-6 text-yellow-400" />
                       </div>
                     </div>
                     <div className="space-y-4">
-                      <h3 className="text-2xl font-bold text-gray-800">Drop your food image here</h3>
-                      <p className="text-gray-600 text-lg">
+                      <h3 className="text-2xl font-bold text-white">Drop your food image here</h3>
+                      <p className="text-gray-300 text-lg">
                         Or click to browse your delicious photos
                       </p>
-                      <div className="flex justify-center space-x-4 text-sm text-gray-500">
-                        <span className="bg-gray-100 px-3 py-1 rounded-full">JPG</span>
-                        <span className="bg-gray-100 px-3 py-1 rounded-full">PNG</span>
-                        <span className="bg-gray-100 px-3 py-1 rounded-full">WEBP</span>
+                      <div className="flex justify-center space-x-4 text-sm text-gray-400">
+                        <span className="bg-gray-700 px-3 py-1 rounded-full">JPG</span>
+                        <span className="bg-gray-700 px-3 py-1 rounded-full">PNG</span>
+                        <span className="bg-gray-700 px-3 py-1 rounded-full">WEBP</span>
                       </div>
                     </div>
                   </div>
@@ -614,7 +581,7 @@ const handleImageUpload = async (event) => {
                       setUploadedImage(null);
                       setImageFile(null);
                     }}
-                    className="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
+                    className="px-8 py-4 border-2 border-gray-600 text-gray-300 rounded-xl hover:bg-gray-700/50 transition-all duration-200 font-medium"
                   >
                     Remove Image
                   </button>
@@ -631,28 +598,28 @@ const handleImageUpload = async (event) => {
 
             {/* Features */}
             <div className="mt-12 grid md:grid-cols-3 gap-6">
-              <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Camera className="w-6 h-6 text-blue-600" />
+              <div className="text-center p-6 bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700">
+                <div className="w-12 h-12 bg-blue-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Camera className="w-6 h-6 text-blue-400" />
                 </div>
-                <h3 className="font-bold text-gray-800 mb-2">Smart Recognition</h3>
-                <p className="text-sm text-gray-600">AI identifies ingredients from your photos</p>
+                <h3 className="font-bold text-white mb-2">Smart Recognition</h3>
+                <p className="text-sm text-gray-300">AI identifies ingredients from your photos</p>
               </div>
               
-              <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <ChefHat className="w-6 h-6 text-green-600" />
+              <div className="text-center p-6 bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700">
+                <div className="w-12 h-12 bg-green-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ChefHat className="w-6 h-6 text-green-400" />
                 </div>
-                <h3 className="font-bold text-gray-800 mb-2">Perfect Matches</h3>
-                <p className="text-sm text-gray-600">Get recipes that match your ingredients</p>
+                <h3 className="font-bold text-white mb-2">Perfect Matches</h3>
+                <p className="text-sm text-gray-300">Get recipes that match your ingredients</p>
               </div>
               
-              <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl">
-                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Sparkles className="w-6 h-6 text-purple-600" />
+              <div className="text-center p-6 bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700">
+                <div className="w-12 h-12 bg-purple-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="w-6 h-6 text-purple-400" />
                 </div>
-                <h3 className="font-bold text-gray-800 mb-2">Instant Results</h3>
-                <p className="text-sm text-gray-600">Fast AI analysis with detailed suggestions</p>
+                <h3 className="font-bold text-white mb-2">Instant Results</h3>
+                <p className="text-sm text-gray-300">Fast AI analysis with detailed suggestions</p>
               </div>
             </div>
           </div>

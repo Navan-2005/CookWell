@@ -1,288 +1,336 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Search, Send, Users, MessageCircle, Phone, Video, MoreVertical, Smile } from "lucide-react";
-import axios from "axios";
+import React, { useState } from 'react';
+import { Heart, Users, Share2, Star, Clock, ChefHat } from 'lucide-react';
 
-// Mock data for demonstration
-const mockUsers = [
-  { _id: "1", username: "Alice Johnson", email: "alice@example.com", status: "online", avatar: "AJ", lastSeen: "2 min ago" },
-  { _id: "2", username: "Bob Smith", email: "bob@example.com", status: "offline", avatar: "BS", lastSeen: "1 hour ago" },
-  { _id: "3", username: "Charlie Brown", email: "charlie@example.com", status: "online", avatar: "CB", lastSeen: "just now" },
-  { _id: "4", username: "Diana Prince", email: "diana@example.com", status: "away", avatar: "DP", lastSeen: "5 min ago" },
-  { _id: "5", username: "Ethan Hunt", email: "ethan@example.com", status: "online", avatar: "EH", lastSeen: "1 min ago" },
-];
-
-const Sidebar = ({ users, onUserSelect, selectedUser, searchTerm, setSearchTerm }) => {
-  const filteredUsers = users.filter(user => 
-    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'online': return 'bg-green-400';
-      case 'away': return 'bg-yellow-400';
-      case 'offline': return 'bg-gray-400';
-      default: return 'bg-gray-400';
-    }
+const CommunityPage = () => {
+  const allRecipes = {
+    "Navan": [
+      {
+        id: 1,
+        name: "Mysore Masala Dosa",
+        author: "Navan",
+        likes: 24,
+        time: "30 mins",
+        difficulty: "Medium",
+        isLiked: false,
+        tags: ["South Indian", "Breakfast", "Vegetarian"]
+      },
+      {
+        id: 3,
+        name: "Rava Upma",
+        author: "Navan",
+        likes: 12,
+        time: "15 mins",
+        difficulty: "Easy",
+        isLiked: false,
+        tags: ["South Indian", "Breakfast", "Quick"]
+      },
+      {
+        id: 5,
+        name: "Chole Bhature",
+        author: "Navan",
+        likes: 27,
+        time: "60 mins",
+        difficulty: "Hard",
+        isLiked: false,
+        tags: ["North Indian", "Lunch", "Vegetarian"]
+      },
+      {
+        id: 7,
+        name: "Bisi Bele Bath",
+        author: "Navan",
+        likes: 19,
+        time: "50 mins",
+        difficulty: "Medium",
+        isLiked: true,
+        tags: ["South Indian", "Lunch", "Traditional"]
+      }
+    ],
+    "Samanvi": [
+      {
+        id: 2,
+        name: "Butter Chicken Curry",
+        author: "Samanvi",
+        likes: 18,
+        time: "45 mins",
+        difficulty: "Easy",
+        isLiked: true,
+        tags: ["North Indian", "Dinner", "Non-Veg"]
+      },
+      {
+        id: 4,
+        name: "Paneer Tikka Masala",
+        author: "Samanvi",
+        likes: 31,
+        time: "40 mins",
+        difficulty: "Medium",
+        isLiked: true,
+        tags: ["North Indian", "Vegetarian", "Dinner"]
+      },
+      {
+        id: 6,
+        name: "Sambar Rice",
+        author: "Samanvi",
+        likes: 15,
+        time: "35 mins",
+        difficulty: "Easy",
+        isLiked: false,
+        tags: ["South Indian", "Lunch", "Comfort Food"]
+      },
+      {
+        id: 8,
+        name: "Hyderabadi Biryani",
+        author: "Samanvi",
+        likes: 42,
+        time: "90 mins",
+        difficulty: "Hard",
+        isLiked: true,
+        tags: ["South Indian", "Dinner", "Non-Veg", "Special"]
+      }
+    ]
   };
 
-  // const getallusers=async()=>{
-  //   const res = await axios.post("http://localhost:3000/user/getallusers");
-  //   const data = res.data.users;
-  //   setUsers(data);
-  // }
+  const [selectedPerson, setSelectedPerson] = useState('Navan');
+  const [recipes, setRecipes] = useState(allRecipes[selectedPerson]);
+  const [newRecipe, setNewRecipe] = useState('');
+  const [selectedAuthor, setSelectedAuthor] = useState('Navan');
 
-  // useEffect(() => {
-  //   getallusers();
-  // }, []);
-
-  return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full">
-      {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <Users className="w-5 h-5 text-blue-600" />
-            Community
-          </h2>
-          <span className="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full font-medium">
-            {users.length} users
-          </span>
-        </div>
-        
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <input
-            type="text"
-            placeholder="Search users..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-          />
-        </div>
-      </div>
-
-      {/* Users List */}
-      <div className="flex-1 overflow-y-auto">
-        {filteredUsers.map(user => (
-          <div
-            key={user._id}
-            className={`p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition-all duration-200 ${
-              selectedUser?._id === user._id ? 'bg-blue-50 border-r-2 border-r-blue-500' : ''
-            }`}
-            onClick={() => onUserSelect(user)}
-          >
-            <div className="flex items-center space-x-3">
-              {/* Avatar */}
-              <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium text-sm">
-                  {user.avatar}
-                </div>
-                <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${getStatusColor(user.status)} rounded-full border-2 border-white`}></div>
-              </div>
-              
-              {/* User Info */}
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900 truncate">{user.username}</p>
-                <p className="text-sm text-gray-500 truncate">{user.email}</p>
-                <p className="text-xs text-gray-400">{user.lastSeen}</p>
-              </div>
-            </div>
-          </div>
-        ))}
-        
-        {filteredUsers.length === 0 && (
-          <div className="p-8 text-center text-gray-500">
-            <Users className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p>No users found</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const ChatPanel = ({ user }) => {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const messagesEndRef = useRef(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const handlePersonSelect = (person) => {
+    setSelectedPerson(person);
+    setRecipes(allRecipes[person]);
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  // Sample messages for demonstration
-  useEffect(() => {
-    if (user) {
-      const sampleMessages = [
-        { from: "them", text: "Hey there! How are you doing?", timestamp: "10:30 AM" },
-        { from: "me", text: "I'm doing great, thanks! How about you?", timestamp: "10:32 AM" },
-        { from: "them", text: "Pretty good! Working on some exciting projects.", timestamp: "10:35 AM" },
-      ];
-      setMessages(sampleMessages);
-    }
-  }, [user]);
-
-  if (!user) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <MessageCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-xl font-medium text-gray-900 mb-2">Welcome to Community Chat</h3>
-          <p className="text-gray-500 max-w-sm">
-            Select a user from the sidebar to start a conversation and connect with your community.
-          </p>
-        </div>
-      </div>
+  const handleLike = (id) => {
+    const updatedRecipes = recipes.map(recipe => 
+      recipe.id === id 
+        ? { ...recipe, isLiked: !recipe.isLiked, likes: recipe.isLiked ? recipe.likes - 1 : recipe.likes + 1 }
+        : recipe
     );
-  }
-
-  const handleSend = () => {
-    if (!input.trim()) return;
-    const newMessage = {
-      from: "me",
-      text: input,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-    setMessages(prev => [...prev, newMessage]);
-    setInput("");
+    setRecipes(updatedRecipes);
+    allRecipes[selectedPerson] = updatedRecipes;
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+  const handleAddRecipe = () => {
+    if (newRecipe.trim()) {
+      const newId = Math.max(...Object.values(allRecipes).flat().map(r => r.id)) + 1;
+      const newRecipeObj = {
+        id: newId,
+        name: newRecipe,
+        author: selectedAuthor,
+        likes: 0,
+        time: "-- mins",
+        difficulty: "Medium",
+        isLiked: false,
+        tags: ["New Recipe"]
+      };
+      
+      if (selectedAuthor === selectedPerson) {
+        const updatedRecipes = [...recipes, newRecipeObj];
+        setRecipes(updatedRecipes);
+        allRecipes[selectedPerson] = updatedRecipes;
+      } else {
+        allRecipes[selectedAuthor] = [...allRecipes[selectedAuthor], newRecipeObj];
+      }
+      setNewRecipe('');
+    }
+  };
+
+  const getDifficultyColor = (difficulty) => {
+    switch(difficulty) {
+      case 'Easy': return 'text-emerald-400';
+      case 'Medium': return 'text-amber-400';
+      case 'Hard': return 'text-rose-400';
+      default: return 'text-slate-400';
     }
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white">
-      {/* Chat Header */}
-      <div className="border-b border-gray-200 p-4 bg-white">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium">
-                {user.avatar}
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      {/* Header */}
+      <div className="bg-slate-900 border-b border-slate-800">
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <ChefHat className="w-8 h-8 text-orange-400" />
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-rose-400 bg-clip-text text-transparent">
+                Recipe Community
+              </h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 text-slate-300">
+                <Users className="w-5 h-5" />
+                <span className="text-sm">2 Active Members</span>
               </div>
-              <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-white`}></div>
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">{user.username}</h2>
-              <p className="text-sm text-green-600">Online</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
-              <Phone className="w-5 h-5" />
-            </button>
-            <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
-              <Video className="w-5 h-5" />
-            </button>
-            <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
-              <MoreVertical className="w-5 h-5" />
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`flex ${msg.from === "me" ? "justify-end" : "justify-start"}`}
-          >
-            <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-              msg.from === "me"
-                ? "bg-blue-600 text-white rounded-br-sm"
-                : "bg-white text-gray-900 rounded-bl-sm shadow-sm border border-gray-200"
-            }`}>
-              <p className="text-sm">{msg.text}</p>
-              <p className={`text-xs mt-1 ${
-                msg.from === "me" ? "text-blue-100" : "text-gray-500"
-              }`}>
-                {msg.timestamp}
+      {/* Main Content Area */}
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="flex gap-6">
+          {/* Left Sidebar - Contacts */}
+          <div className="w-80 flex-shrink-0">
+            <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 sticky top-6">
+              <h2 className="text-xl font-semibold mb-4 flex items-center text-slate-100">
+                <Users className="w-5 h-5 mr-2 text-blue-400" />
+                Community Members
+              </h2>
+              <div className="space-y-3">
+                <div 
+                  onClick={() => handlePersonSelect('Navan')}
+                  className={`flex items-center space-x-3 rounded-lg px-4 py-3 transition-all duration-200 cursor-pointer border ${
+                    selectedPerson === 'Navan' 
+                      ? 'bg-blue-600/20 border-blue-500/50 hover:bg-blue-600/30' 
+                      : 'bg-slate-800 border-slate-700 hover:bg-slate-700 hover:border-slate-600'
+                  }`}
+                >
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
+                    N
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-100">Navan</p>
+                    <p className="text-xs text-slate-400">
+                      {allRecipes['Navan'].length} favorites
+                    </p>
+                  </div>
+                </div>
+                <div 
+                  onClick={() => handlePersonSelect('Samanvi')}
+                  className={`flex items-center space-x-3 rounded-lg px-4 py-3 transition-all duration-200 cursor-pointer border ${
+                    selectedPerson === 'Samanvi' 
+                      ? 'bg-pink-600/20 border-pink-500/50 hover:bg-pink-600/30' 
+                      : 'bg-slate-800 border-slate-700 hover:bg-slate-700 hover:border-slate-600'
+                  }`}
+                >
+                  <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-600 rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
+                    S
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-100">Samanvi</p>
+                    <p className="text-xs text-slate-400">
+                      {allRecipes['Samanvi'].length} favorites
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Content Area */}
+          <div className="flex-1">
+            {/* Add Recipe Section */}
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 mb-8 shadow-xl">
+              <h2 className="text-2xl font-bold mb-6 flex items-center text-slate-100">
+                <Share2 className="w-6 h-6 mr-3 text-emerald-400" />
+                Share Your Favorite Recipe
+              </h2>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative">
+                  <select 
+                    value={selectedAuthor} 
+                    onChange={(e) => setSelectedAuthor(e.target.value)}
+                    className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer min-w-[120px]"
+                  >
+                    <option value="Navan">Navan</option>
+                    <option value="Samanvi">Samanvi</option>
+                  </select>
+                </div>
+                <input
+                  type="text"
+                  value={newRecipe}
+                  onChange={(e) => setNewRecipe(e.target.value)}
+                  placeholder="Enter your favorite recipe name..."
+                  className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-5 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+                />
+                <button
+                  onClick={handleAddRecipe}
+                  className="bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 px-8 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-orange-500/25 text-white"
+                >
+                  Share Recipe
+                </button>
+              </div>
+            </div>
+
+            {/* Favorites Header */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-3xl font-bold bg-gradient-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent">
+                  {selectedPerson}'s Favorite Recipes
+                </h3>
+                <div className="flex items-center space-x-2 bg-slate-800 border border-slate-700 rounded-full px-4 py-2">
+                  <div className={`w-3 h-3 rounded-full ${selectedPerson === 'Navan' ? 'bg-blue-500' : 'bg-pink-500'}`}></div>
+                  <span className="text-sm text-slate-300">{recipes.length} recipes</span>
+                </div>
+              </div>
+              <p className="text-slate-400 text-lg">
+                Discover {selectedPerson === 'Navan' ? 'his' : 'her'} collection of delicious recipes
               </p>
             </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
 
-      {/* Message Input */}
-      <div className="border-t border-gray-200 p-4 bg-white">
-        <div className="flex items-end space-x-2">
-          <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
-            <Smile className="w-5 h-5" />
-          </button>
-          <div className="flex-1">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder={`Message ${user.username}...`}
-              className="w-full px-4 py-2 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all"
-              rows="1"
-              style={{ maxHeight: '120px' }}
-            />
+            {/* Recipe Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {recipes.map((recipe) => (
+                <div key={recipe.id} className="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:bg-slate-800 hover:border-slate-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-lg ${
+                        recipe.author === 'Navan' 
+                          ? 'bg-gradient-to-br from-blue-500 to-purple-600' 
+                          : 'bg-gradient-to-br from-pink-500 to-rose-600'
+                      }`}>
+                        {recipe.author[0]}
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium text-slate-100">{recipe.author}</span>
+                        <p className="text-xs text-slate-500">Recipe Creator</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleLike(recipe.id)}
+                      className={`flex items-center space-x-2 px-3 py-2 rounded-full transition-all duration-200 transform hover:scale-110 ${
+                        recipe.isLiked 
+                          ? 'text-rose-400 bg-rose-500/10 hover:bg-rose-500/20' 
+                          : 'text-slate-500 hover:text-rose-400 hover:bg-rose-500/10'
+                      }`}
+                    >
+                      <Heart className={`w-5 h-5 ${recipe.isLiked ? 'fill-current' : ''}`} />
+                      <span className="text-sm font-medium">{recipe.likes}</span>
+                    </button>
+                  </div>
+                  
+                  <h3 className="text-xl font-bold mb-4 text-slate-100 leading-tight">{recipe.name}</h3>
+                  
+                  <div className="flex items-center space-x-6 mb-4">
+                    <div className="flex items-center space-x-2 text-slate-300">
+                      <Clock className="w-5 h-5 text-blue-400" />
+                      <span className="text-sm font-medium">{recipe.time}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Star className="w-5 h-5 text-amber-400" />
+                      <span className={`text-sm font-medium ${getDifficultyColor(recipe.difficulty)}`}>
+                        {recipe.difficulty}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    {recipe.tags.map((tag, index) => (
+                      <span 
+                        key={index} 
+                        className="px-3 py-1 bg-slate-800 border border-slate-700 text-xs font-medium rounded-full text-slate-300 hover:bg-slate-700 hover:border-slate-600 transition-colors"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <button
-            onClick={handleSend}
-            disabled={!input.trim()}
-            className={`p-2 rounded-full transition-all ${
-              input.trim()
-                ? "bg-blue-600 text-white hover:bg-blue-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
-          >
-            <Send className="w-5 h-5" />
-          </button>
         </div>
       </div>
     </div>
   );
 };
 
-function Community() {
-  const [users, setUsers] = useState(mockUsers);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // Simulate API call
-  useEffect(() => {
-    // Replace this with your actual API call
-    const fetchUsers = async () => {
-      const res = await axios.post("http://localhost:3000/user/getallusers");
-      const data = res.data.users;
-      console.log(data);
-      
-      setUsers(data);
-    };
-    fetchUsers();
-    
-    // Using mock data for now
-    // setUsers(mockUsers);
-  }, []);
-
-  return (
-    <div className="flex h-screen bg-gray-100">
-      <Sidebar 
-        users={users} 
-        onUserSelect={setSelectedUser} 
-        selectedUser={selectedUser}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-      />
-      <ChatPanel user={selectedUser} />
-    </div>
-  );
-}
-
-export default Community;
+export default CommunityPage;

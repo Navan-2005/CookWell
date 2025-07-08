@@ -23,6 +23,7 @@ import RecipeChatBot from './chatbolt.jsx'
 import { Layout } from './Pages/Layout.jsx'
 import ContactForm from './components/ContactForm.jsx'
 import Wrapper from './Pages/Wrapper.jsx'
+import ProfilePage from './Pages/Profile.jsx'
 
 // Layout component
 // function Layout() {
@@ -37,8 +38,6 @@ import Wrapper from './Pages/Wrapper.jsx'
 
 // Main App
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <Provider store={store}>
       <BrowserRouter>
@@ -58,6 +57,7 @@ function App() {
             <Route path='/chat' element={<Wrapper><RecipeChatBot /></Wrapper>}/>
             <Route path='/community' element={<Wrapper><Community /></Wrapper>}/>
             <Route path='/contact' element ={<Wrapper><ContactForm /></Wrapper>}/>
+            <Route path='/profile' element={<Wrapper><ProfilePage/></Wrapper>}/>
           </Routes>
         </div>
       </BrowserRouter>

@@ -1,296 +1,258 @@
-import { useState } from 'react';
-import { User, Mail, Ruler, Weight, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, Scale, Ruler, Utensils } from 'lucide-react';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState({
     name: '',
-    email: '',
+    age: '',
+    gender: '',
     height: '',
     weight: '',
-    age: ''
+    dietType: ''
   });
-  const [isEditing, setIsEditing] = useState(true);
-  const [errors, setErrors] = useState({});
 
-  const handleInputChange = (field, value) => {
+  const [errors, setErrors] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
+  const [savedProfile, setSavedProfile] = useState({
+    name: '',
+    age: '',
+    gender: '',
+    height: '',
+    weight: '',
+    dietType: ''
+  });
+
+  const handleSaveProfile = () => {
+    // Validate all required fields
+    const newErrors = {};
+    Object.keys(profile).forEach(key => {
+      if (!profile[key]) {
+        newErrors[key] = 'This field is required';
+      }
+    });
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    
+    setSavedProfile({...profile});
+    setIsEditing(false);
+    console.log('Profile saved:', profile);
+    alert('Profile saved successfully!');
+  };
+
+  const handleUpdateProfile = () => {
+    setIsEditing(true);
+    alert('Update mode enabled! You can now edit your profile.');
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Text-only validation for name
+    if (name === 'name') {
+      const textOnlyRegex = /^[a-zA-Z\s]*$/;
+      if (!textOnlyRegex.test(value)) {
+        setErrors(prev => ({
+          ...prev,
+          name: 'Name should contain only letters and spaces'
+        }));
+        return;
+      } else {
+        setErrors(prev => ({
+          ...prev,
+          name: ''
+        }));
+      }
+    }
+    
+    // Number validation for age, height, weight
+    if (['age', 'height', 'weight'].includes(name)) {
+      const numberRegex = /^\d*\.?\d*$/;
+      if (!numberRegex.test(value)) {
+        setErrors(prev => ({
+          ...prev,
+          [name]: 'Please enter numbers only'
+        }));
+        return;
+      } else {
+        setErrors(prev => ({
+          ...prev,
+          [name]: ''
+        }));
+      }
+    }
+    
     setProfile(prev => ({
       ...prev,
-      [field]: value
+      [name]: value
     }));
-    
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: ''
-      }));
-    }
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!profile.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-    
-    if (!profile.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(profile.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-    
-    if (!profile.height) {
-      newErrors.height = 'Height is required';
-    } else if (parseFloat(profile.height) <= 0) {
-      newErrors.height = 'Height must be greater than 0';
-    }
-    
-    if (!profile.weight) {
-      newErrors.weight = 'Weight is required';
-    } else if (parseFloat(profile.weight) <= 0) {
-      newErrors.weight = 'Weight must be greater than 0';
-    }
-    
-    if (!profile.age) {
-      newErrors.age = 'Age is required';
-    } else if (parseInt(profile.age) <= 0 || parseInt(profile.age) > 150) {
-      newErrors.age = 'Please enter a valid age';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
-  const handleSave = () => {
-    if (validateForm()) {
-      setIsEditing(false);
-    }
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  const calculateBMI = () => {
-    if (profile.weight && profile.height) {
-      const weightNum = parseFloat(profile.weight);
-      const heightNum = parseFloat(profile.height);
-      const bmi = weightNum / (heightNum * heightNum);
-      return bmi.toFixed(1);
-    }
-    return null;
-  };
-
-  const getBMICategory = (bmi) => {
-    if (bmi < 18.5) return 'Underweight';
-    if (bmi < 25) return 'Normal weight';
-    if (bmi < 30) return 'Overweight';
-    return 'Obese';
-  };
-
-  const bmi = calculateBMI();
 
   return (
-    <div className="max-w-2xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-lg">
-      <div className="text-center mb-8">
-        <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <User className="w-12 h-12 text-blue-600" />
-        </div>
-        <h1 className="text-3xl font-bold text-gray-800">
-          {profile.name || 'Your Profile'}
-        </h1>
-        {profile.email && (
-          <p className="text-gray-600 mt-2">{profile.email}</p>
-        )}
-      </div>
+    <div className="min-h-screen bg-gray-900 text-white p-6">
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-gray-800 rounded-lg shadow-xl p-8 border border-gray-700">
+          {/* Header */}
+          <div className="flex items-center justify-center mb-8">
+            <User className="w-12 h-12 text-blue-400 mr-4" />
+            <h1 className="text-3xl font-bold text-white">User Profile</h1>
+          </div>
 
-      {isEditing ? (
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Edit Profile Information
-          </h2>
-          
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-6">
+            {/* Name Input */}
             <div>
-              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                <User className="w-4 h-4 mr-2" />
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Full Name
               </label>
               <input
                 type="text"
+                name="name"
                 value={profile.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
+                onChange={handleInputChange}
+                disabled={!isEditing && savedProfile.name}
+                className={`w-full px-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 ${
+                  !isEditing && savedProfile.name ? 'bg-gray-800 cursor-not-allowed' : 'bg-gray-700'
+                }`}
                 placeholder="Enter your full name"
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.name ? 'border-red-500' : 'border-gray-300'
-                }`}
               />
-              {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-              )}
+              {errors.name && <p className="mt-1 text-sm text-red-400">{errors.name}</p>}
             </div>
 
+            {/* Age Input */}
             <div>
-              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                <Mail className="w-4 h-4 mr-2" />
-                Email Address
-              </label>
-              <input
-                type="email"
-                value={profile.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                placeholder="Enter your email"
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.email ? 'border-red-500' : 'border-gray-300'
-                }`}
-              />
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                <Ruler className="w-4 h-4 mr-2" />
-                Height (meters)
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={profile.height}
-                onChange={(e) => handleInputChange('height', e.target.value)}
-                placeholder="e.g., 1.75"
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.height ? 'border-red-500' : 'border-gray-300'
-                }`}
-              />
-              {errors.height && (
-                <p className="text-red-500 text-sm mt-1">{errors.height}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                <Weight className="w-4 h-4 mr-2" />
-                Weight (kg)
-              </label>
-              <input
-                type="number"
-                value={profile.weight}
-                onChange={(e) => handleInputChange('weight', e.target.value)}
-                placeholder="Enter your weight"
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.weight ? 'border-red-500' : 'border-gray-300'
-                }`}
-              />
-              {errors.weight && (
-                <p className="text-red-500 text-sm mt-1">{errors.weight}</p>
-              )}
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                <Calendar className="w-4 h-4 mr-2" />
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Age
               </label>
               <input
-                type="number"
+                type="text"
+                name="age"
                 value={profile.age}
-                onChange={(e) => handleInputChange('age', e.target.value)}
+                onChange={handleInputChange}
+                disabled={!isEditing && savedProfile.age}
+                className={`w-full px-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 ${
+                  !isEditing && savedProfile.age ? 'bg-gray-800 cursor-not-allowed' : 'bg-gray-700'
+                }`}
                 placeholder="Enter your age"
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.age ? 'border-red-500' : 'border-gray-300'
-                } md:w-48`}
               />
-              {errors.age && (
-                <p className="text-red-500 text-sm mt-1">{errors.age}</p>
+              {errors.age && <p className="mt-1 text-sm text-red-400">{errors.age}</p>}
+            </div>
+
+            {/* Gender Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Gender
+              </label>
+              <select
+                name="gender"
+                value={profile.gender}
+                onChange={handleInputChange}
+                disabled={!isEditing && savedProfile.gender}
+                className={`w-full px-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white ${
+                  !isEditing && savedProfile.gender ? 'bg-gray-800 cursor-not-allowed' : 'bg-gray-700'
+                }`}
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+                <option value="prefer-not-to-say">Prefer not to say</option>
+              </select>
+              {errors.gender && <p className="mt-1 text-sm text-red-400">{errors.gender}</p>}
+            </div>
+
+            {/* Height Input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                <Ruler className="inline w-4 h-4 mr-1" />
+                Height (cm)
+              </label>
+              <input
+                type="text"
+                name="height"
+                value={profile.height}
+                onChange={handleInputChange}
+                disabled={!isEditing && savedProfile.height}
+                className={`w-full px-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 ${
+                  !isEditing && savedProfile.height ? 'bg-gray-800 cursor-not-allowed' : 'bg-gray-700'
+                }`}
+                placeholder="Enter your height in cm"
+              />
+              {errors.height && <p className="mt-1 text-sm text-red-400">{errors.height}</p>}
+            </div>
+
+            {/* Weight Input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                <Scale className="inline w-4 h-4 mr-1" />
+                Weight (kg)
+              </label>
+              <input
+                type="text"
+                name="weight"
+                value={profile.weight}
+                onChange={handleInputChange}
+                disabled={!isEditing && savedProfile.weight}
+                className={`w-full px-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 ${
+                  !isEditing && savedProfile.weight ? 'bg-gray-800 cursor-not-allowed' : 'bg-gray-700'
+                }`}
+                placeholder="Enter your weight in kg"
+              />
+              {errors.weight && <p className="mt-1 text-sm text-red-400">{errors.weight}</p>}
+            </div>
+
+            {/* Diet Type Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                <Utensils className="inline w-4 h-4 mr-1" />
+                Diet Preference
+              </label>
+              <select
+                name="dietType"
+                value={profile.dietType}
+                onChange={handleInputChange}
+                disabled={!isEditing && savedProfile.dietType}
+                className={`w-full px-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white ${
+                  !isEditing && savedProfile.dietType ? 'bg-gray-800 cursor-not-allowed' : 'bg-gray-700'
+                }`}
+              >
+                <option value="">Select Diet Type</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="non-vegetarian">Non-Vegetarian</option>
+                <option value="vegan">Vegan</option>
+                <option value="mixed">Mixed</option>
+              </select>
+              {errors.dietType && <p className="mt-1 text-sm text-red-400">{errors.dietType}</p>}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex space-x-4 justify-center pt-6">
+              {(!savedProfile.name || isEditing) && (
+                <button
+                  type="button"
+                  onClick={handleSaveProfile}
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  Save Profile
+                </button>
+              )}
+              
+              {savedProfile.name && !isEditing && (
+                <button
+                  type="button"
+                  onClick={handleUpdateProfile}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Update Profile
+                </button>
               )}
             </div>
           </div>
-
-          <div className="flex justify-center">
-            <button
-              onClick={handleSave}
-              className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
-            >
-              Save Profile
-            </button>
-          </div>
         </div>
-      ) : (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Profile Information
-            </h2>
-            <button
-              onClick={handleEdit}
-              className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-200"
-            >
-              Edit Profile
-            </button>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="flex items-center p-3 bg-gray-50 rounded-md">
-                <User className="w-5 h-5 text-gray-600 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-600">Name</p>
-                  <p className="font-medium">{profile.name}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center p-3 bg-gray-50 rounded-md">
-                <Mail className="w-5 h-5 text-gray-600 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-600">Email</p>
-                  <p className="font-medium">{profile.email}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center p-3 bg-gray-50 rounded-md">
-                <Calendar className="w-5 h-5 text-gray-600 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-600">Age</p>
-                  <p className="font-medium">{profile.age} years</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center p-3 bg-gray-50 rounded-md">
-                <Ruler className="w-5 h-5 text-gray-600 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-600">Height</p>
-                  <p className="font-medium">{profile.height} m</p>
-                </div>
-              </div>
-
-              <div className="flex items-center p-3 bg-gray-50 rounded-md">
-                <Weight className="w-5 h-5 text-gray-600 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-600">Weight</p>
-                  <p className="font-medium">{profile.weight} kg</p>
-                </div>
-              </div>
-
-              {bmi && (
-                <div className="p-4 bg-blue-50 rounded-md border border-blue-200">
-                  <h3 className="font-semibold text-blue-800 mb-2">Health Stats</h3>
-                  <p className="text-blue-700">
-                    <span className="font-medium">BMI:</span> {bmi}
-                  </p>
-                  <p className="text-blue-700">
-                    <span className="font-medium">Category:</span> {getBMICategory(parseFloat(bmi))}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
