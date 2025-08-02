@@ -1,0 +1,23 @@
+# Use the official Node.js image
+FROM node:18.9.1
+
+# Set the working directory
+WORKDIR /app
+
+# Copy only package files first (for layer caching)
+COPY package.json package-lock.json* ./
+
+# Install dependencies inside Docker
+RUN npm install
+
+# 🔧 Fix for esbuild binary mismatch inside Docker
+RUN npm rebuild esbuild
+
+# Copy rest of the frontend code
+COPY . .
+
+# Expose Vite dev server port
+EXPOSE 5173
+
+# Run Vite dev server (optional: add --host for Docker access)
+CMD ["npm", "run", "dev", "--", "--host"]
