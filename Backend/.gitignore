@@ -6,10 +6,8 @@ logs
 *.log
 
 # Environment variables
-
+.env
 
 # OS-specific
 .DS_Store
 Thumbs.db
-
-.env
