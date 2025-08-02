@@ -23,7 +23,7 @@ export default function Favorites() {
 
       try {
         setLoading(true);
-        const response = await axios.post('http://localhost:3000/user/getfavourites', {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/user/getfavourites`, {
           userId: user._id
         });
         

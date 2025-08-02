@@ -4,6 +4,7 @@ const cors=require('cors');
 const app=express();
 const aiRoutes=require('./routes/airoutes')
 const userRoutes=require('./routes/userRoutes')
+require("dotenv").config();
 const connectDB=require('./db/db')
 connectDB();
 

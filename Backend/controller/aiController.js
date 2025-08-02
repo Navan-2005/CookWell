@@ -43,7 +43,6 @@ const getpersonalised = async (req,res)=>{
     console.log('Getting diet error : ',error);
     res.status(500).send({ error});
   }
-
 }
 
 module.exports = {

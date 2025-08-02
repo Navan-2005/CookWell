@@ -56,6 +56,7 @@ const createUser = async (req, res) => {
       res.status(400).json({ error: error.message });
     }
   }
+  
   const getprofile=async(req,res)=>{
     try {
       const {userId}=req.body;
@@ -141,7 +142,6 @@ const sendContactEmail = async (req, res) => {
   }
 };
 
-
 const getfavourites=async(req,res)=>{
   const { userId } = req.body;
   try {
@@ -211,9 +211,20 @@ const getallgrocery=async (req,res)=>{
   }
 }
 
-
-
-
+const share=async(req,res)=>{
+  const {userId,favId,senderId}=req.body;
+  try {
+    const user=await user.findById(userId);
+    const favorite=await favourites.findById(favId);
+    const sender=await user.findById(senderId);
+    console.log('user : ',user);
+    console.log('favorite : ',favorite);
+    console.log('sender : ',sender);
+    
+  } catch (error) {
+    
+  }
+}
 
   module.exports={
     createUser,

@@ -139,7 +139,7 @@ const GroceryListApp = () => {
   const addtocart=async()=>{
     console.log('Cart : ',cart);
     try {
-      const response=await axios.post('http://localhost:3000/user/updategrocery',{
+      const response=await axios.post(`${import.meta.env.VITE_API_URL}/user/updategrocery`,{
         grocery:cart,
         userId:user._id
       });

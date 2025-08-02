@@ -19,7 +19,7 @@ export default function RecipeDetails() {
         setLoading(true);
         
         // First, try to get the recipe from favorites
-        const favoritesResponse = await axios.post('http://localhost:3000/user/getfavourites', {
+        const favoritesResponse = await axios.post(`${import.meta.env.VITE_API_URL}/user/getfavourites`, {
           userId: user._id
         });
         
@@ -35,7 +35,7 @@ export default function RecipeDetails() {
         } else {
           // If not in favorites, fetch from main recipes API
           // You'll need to replace this with your actual recipe API endpoint
-          const recipeResponse = await axios.get(`http://localhost:3000/api/recipes/${recipeId}`);
+          const recipeResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/recipes/${recipeId}`);
           setRecipe(recipeResponse.data);
           setIsFavorite(false);
         }
@@ -58,14 +58,14 @@ export default function RecipeDetails() {
     try {
       if (isFavorite) {
         // Remove from favorites
-        await axios.post('http://localhost:3000/user/removefavorite', {
+        await axios.post(`${import.meta.env.VITE_API_URL}/user/removefavorite`, {
           userId: user._id,
           recipeId: recipe.recipeId || recipe._id
         });
         setIsFavorite(false);
       } else {
         // Add to favorites
-        await axios.post('http://localhost:3000/user/addfavorite', {
+        await axios.post(`${import.meta.env.VITE_API_URL}/user/addfavorite`, {
           userId: user._id,
           recipeId: recipe._id,
           recipe: recipe

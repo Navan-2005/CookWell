@@ -27,7 +27,7 @@ export default function ProfilePage() {
 
   const getprofile=async()=>{
     try {
-      const response=await axios.post('http://localhost:3000/user/profile',{
+      const response=await axios.post(`${import.meta.env.VITE_API_URL}/user/profile`,{
         userId:user._id
       })
       console.log('response : ',response.data.user);

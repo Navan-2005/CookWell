@@ -1,5 +1,5 @@
 
-    import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Search, Mic, MicOff, Upload, Camera, ArrowLeft, Send, Bot, User, ChefHat, Clock, Users, Star, Sparkles, Image, Zap, Save, LogIn } from 'lucide-react';
 import axios from 'axios';
 
@@ -116,7 +116,7 @@ const RecipeSearchApp = () => {
         });
         console.log('Ingredients : ', res.data.ingredients);
         
-        const recipe = await axios.post("http://localhost:3000/ai/generate-recipe", {
+        const recipe = await axios.post(`${import.meta.env.VITE_API_URL}/ai/generate-recipe`, {
           ingredients: res.data.ingredients
         });
          
@@ -209,7 +209,7 @@ const RecipeSearchApp = () => {
       console.log('Parsed recipe:', parsedRecipe);
       
       // Send save request to backend
-      const response = await axios.post('http://localhost:3000/user/saverecipe', parsedRecipe);
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/user/saverecipe`, parsedRecipe);
       
       console.log('Save response:', response.data);
       alert('Recipe saved successfully!');
@@ -228,7 +228,7 @@ const RecipeSearchApp = () => {
     
     try {
       // Call backend API to get recipe
-      const response = await axios.post('http://localhost:3000/ai/get-recipe', {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/ai/get-recipe`, {
         prompt: query
       });
 

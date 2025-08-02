@@ -15,6 +15,7 @@ const DietForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [dietPlan, setDietPlan] = useState(null);
   const [error, setError] = useState(null);
+  const [debugInfo, setDebugInfo] = useState(null); // Added for debugging
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,16 +26,17 @@ const DietForm = () => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setDebugInfo(null); // Clear previous debug info
     
     try {
       console.log('Sending form data:', formData);
       
-      const response = await fetch('http://localhost:3000/ai/get-diet', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/ai/get-diet`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({user:formData}),
+        body: JSON.stringify({user: formData}),
       });
 
       console.log('Response status:', response.status);
@@ -47,21 +49,40 @@ const DietForm = () => {
       }
 
       const data = await response.json();
-      console.log('Received data:', data);
+      console.log('Full response data:', data);
       
-      // Handle different possible response formats
+      // Enhanced debugging
+      // setDebugInfo({
+      //   rawResponse: data,
+      //   dataType: typeof data,
+      //   hasProperties: Object.keys(data),
+      //   dietPlanExists: !!data.dietPlan,
+      //   planExists: !!data.plan,
+      //   messageExists: !!data.message
+      // });
+      
+      // Handle different possible response formats with better logging
+      let planContent = null;
       if (data.dietPlan) {
-        setDietPlan(data.dietPlan);
+        console.log('Using data.dietPlan:', typeof data.dietPlan, data.dietPlan);
+        planContent = data.dietPlan;
       } else if (data.plan) {
-        setDietPlan(data.plan);
+        console.log('Using data.plan:', typeof data.plan, data.plan);
+        planContent = data.plan;
       } else if (data.message) {
-        setDietPlan(data.message);
+        console.log('Using data.message:', typeof data.message, data.message);
+        planContent = data.message;
       } else if (typeof data === 'string') {
-        setDietPlan(data);
+        console.log('Using data as string:', data);
+        planContent = data;
       } else {
-        console.error('Unexpected response format:', data);
-        setDietPlan(JSON.stringify(data, null, 2));
+        console.log('Unexpected response format, stringifying:', data);
+        planContent = JSON.stringify(data, null, 2);
       }
+      
+      console.log('Final planContent being set:', planContent);
+      setDietPlan(planContent);
+      
     } catch (err) {
       console.error('Error in handleSubmit:', err);
       setError(err.message);
@@ -112,9 +133,24 @@ const DietForm = () => {
     };
 
     const parseContent = (text) => {
-      if (!text) return [];
+      if (!text) {
+        console.log('No text provided to parseContent');
+        return [];
+      }
       
-      const textStr = typeof text === 'string' ? text : JSON.stringify(text, null, 2);
+      console.log('Parsing content:', typeof text, text);
+      
+      let textStr;
+      if (typeof text === 'string') {
+        textStr = text;
+      } else if (typeof text === 'object') {
+        textStr = JSON.stringify(text, null, 2);
+      } else {
+        textStr = String(text);
+      }
+      
+      console.log('Text string to parse:', textStr);
+      
       const lines = textStr.split('\n');
       const sections = [];
       let currentSection = null;
@@ -193,6 +229,7 @@ const DietForm = () => {
         sections.push(currentSection);
       }
       
+      console.log('Parsed sections:', sections);
       return sections;
     };
 
@@ -248,6 +285,33 @@ const DietForm = () => {
     };
 
     const sections = parseContent(plan);
+    
+    // If no sections were parsed, show the raw content
+    if (sections.length === 0) {
+      console.log('No sections parsed, showing raw content');
+      return (
+        <div className="max-w-6xl mx-auto bg-gray-900 shadow-2xl rounded-2xl overflow-hidden">
+          <div className="bg-gradient-to-r from-gray-800 via-gray-900 to-black p-8 text-white">
+            <h1 className="text-4xl font-bold">Your Diet Plan</h1>
+            <p className="text-lg text-gray-300 mt-1">Raw response (parsing failed)</p>
+          </div>
+          <div className="p-6">
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <h3 className="text-lg font-semibold text-yellow-400 mb-3">Raw Response:</h3>
+              <pre className="text-gray-300 whitespace-pre-wrap text-sm overflow-auto max-h-96">
+                {typeof plan === 'string' ? plan : JSON.stringify(plan, null, 2)}
+              </pre>
+            </div>
+            <button
+              onClick={() => setDietPlan(null)}
+              className="mt-4 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300"
+            >
+              Back to Form
+            </button>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className="max-w-6xl mx-auto bg-gray-900 shadow-2xl rounded-2xl overflow-hidden">
@@ -283,6 +347,16 @@ const DietForm = () => {
             </div>
           </div>
         </div>
+
+        {/* Debug Info */}
+        {/* {debugInfo && (
+          <div className="bg-yellow-900 border-l-4 border-yellow-400 p-4 m-4 rounded">
+            <h3 className="font-bold text-yellow-300 mb-2">Debug Info:</h3>
+            <pre className="text-xs text-yellow-200 overflow-auto max-h-32">
+              {JSON.stringify(debugInfo, null, 2)}
+            </pre>
+          </div>
+        )} */}
 
         {/* Navigation */}
         <div className="bg-gray-800 border-b border-gray-700 p-4">
@@ -437,7 +511,29 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
 * **Lunch:** Hearty Lentil Soup with Whole Wheat Roll
 * **Dinner:** Veggie & Bean Burrito Bowl`;
 
+    console.log('Setting sample diet plan');
     setDietPlan(sampleDietPlan);
+  };
+
+  // Test with various response formats
+  const testDifferentFormats = () => {
+    // Test different response formats your backend might send
+    const testFormats = [
+      // Format 1: Plain string
+      "This is a simple diet plan string",
+      
+      // Format 2: Object with dietPlan property
+      { dietPlan: "Diet plan in object format" },
+      
+      // Format 3: Object with plan property
+      { plan: "Diet plan in plan property" },
+      
+      // Format 4: Object with message property
+      { message: "Diet plan in message property" }
+    ];
+    
+    // Test with the first format for now
+    setDietPlan(testFormats[0]);
   };
 
   // Loading State
@@ -473,6 +569,7 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
               onClick={() => {
                 setError(null);
                 setDietPlan(null);
+                setDebugInfo(null);
               }}
               className="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300 font-semibold"
             >
@@ -492,6 +589,7 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
 
   // Diet Plan Display
   if (dietPlan) {
+    console.log('Rendering diet plan:', dietPlan);
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black px-4 py-8">
         <DietPlanDisplay plan={dietPlan} />
@@ -550,13 +648,11 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
                       value={formData[field.name]}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-700 text-gray-200 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 transition-all duration-300 hover:border-gray-500 shadow-sm"
+                      className="w-full px-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-700 text-gray-200 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 transition-all duration-300 hover:border-gray-500 placeholder-gray-400 shadow-sm"
                     >
                       <option value="">Select {field.label}</option>
-                      {field.options.map(option => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
+                      {field.options.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
                       ))}
                     </select>
                   ) : (
@@ -596,13 +692,21 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
               )}
             </button>
             
-            {/* Test button for debugging */}
-            <button
-              onClick={testWithSampleData}
-              className="w-full py-2 px-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-300 text-sm font-medium"
-            >
-              Test with Sample Data (Debug)
-            </button>
+            {/* Test buttons for debugging */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <button
+                onClick={testWithSampleData}
+                className="w-full py-2 px-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-300 text-sm font-medium"
+              >
+                Test with Sample Data
+              </button>
+              <button
+                onClick={testDifferentFormats}
+                className="w-full py-2 px-4 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors duration-300 text-sm font-medium"
+              >
+                Test Different Formats
+              </button>
+            </div>
           </div>
 
           <div className="text-center pt-4">
@@ -614,6 +718,6 @@ BMR = (10 * weight in kg) + (6.25 * height in cm) - (5 * age in years) + 5
       </div>
     </div>
   );
-};
+}
 
 export default DietForm;
