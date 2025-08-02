@@ -8,11 +8,11 @@ services:
     networks:
       - mern_network
     environment:
-      GEMINI_API_KEY: AIzaSyAjLTI4QqUHI8xQxo1pZR9oUi4fuc4nBVk
-      MONGO_URL: mongodb+srv://CookWell:12345@cookwell.mj3qnad.mongodb.net/?retryWrites=true&w=majority&appName=CookWell
-      JWT_SECRET: secrete
-      EMAIL_USER: mrunknown.2005.2027@gmail.com
-      EMAIL_PASS: mxscayqtduvwwoce
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      MONGO_URL: ${MONGO_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASS: ${EMAIL_PASS}
       
     volumes:
       - ./Backend:/app
@@ -26,7 +26,7 @@ services:
     networks:
       - mern_network
     environment:
-      VITE_API_URL: http://localhost:3000
+      VITE_API_URL: ${VITE_API_URL}
     volumes:
       - ./Frontend:/app
       - /app/node_modules
