@@ -2,7 +2,7 @@ require("dotenv").config();
 const express=require('express');
 const cors=require('cors');
 const app=express();
-const aiRoutes=require('./routes/airoutes')
+const aiRoutes=require('./routes/aiRoutes')
 const userRoutes=require('./routes/userRoutes')
 require("dotenv").config();
 const connectDB=require('./db/db')
@@ -15,4 +15,4 @@ app.use(express.json());
 app.use('/ai',aiRoutes);
 app.use('/user',userRoutes);
 
-app.listen(port,()=>console.log(`Server running on port ${port}`));
+app.listen(port,'0.0.0.0',()=>console.log(`Server running on port ${port}`));
