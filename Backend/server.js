@@ -14,5 +14,6 @@ app.use(express.json());
 
 app.use('/ai',aiRoutes);
 app.use('/user',userRoutes);
+app.use('/',(req,res)=>res.send('Server is running'))
 
-app.listen(port,'0.0.0.0',()=>console.log(`Server running on port ${port}`));
+app.listen(port,()=>console.log(`Server running on port ${port}`));

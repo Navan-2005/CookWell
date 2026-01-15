@@ -15,6 +15,8 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(import.meta.env.VITE_API_URL);
+    
     setLoading(true);
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/user/login`, {
