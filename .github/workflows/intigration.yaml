@@ -58,11 +58,15 @@ jobs:
 
       - name: Run Backend
         working-directory: Backend
-        run: node server.js
+        run: |
+         npm install
+         node server.js
 
       - name: Run Backend Test
         working-directory: tests
-        run: npm run test
+        run: |
+         npm install
+         npm run test
         env:
          BACKEND_URL: http://localhost:3000
 
