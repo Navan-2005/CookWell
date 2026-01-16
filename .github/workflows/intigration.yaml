@@ -56,7 +56,13 @@ jobs:
         working-directory: tests
         run: npm install
 
-      - name: Run Backend Tests
+      - name: Run Backend
+        working-directory: Backend
+        run: nodemon main
+
+      - name: Run Backend Test
         working-directory: tests
         run: npm run test
+        env:
+        BACKEND_URL: http://localhost:3000
 
