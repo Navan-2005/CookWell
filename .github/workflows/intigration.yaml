@@ -58,7 +58,7 @@ jobs:
 
       - name: Run Backend
         working-directory: Backend
-        run: nodemon main
+        run: node server.js
 
       - name: Run Backend Test
         working-directory: tests
