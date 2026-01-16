@@ -12,13 +12,13 @@ const createUser = async (req, res) => {
       const existinguser=await User.findOne({email});
       if(existinguser){
         console.log('User already exists');
-        return res.status(409).json({ error: 'User already exists' });
+        return res.status(400).json({ error: 'User already exists' });
       }
       const user = new User({ username, email,password:hashedPassword });
       await user.save();
       const token=user.generateAuthToken();
       
-      res.status(201).json({user,token});
+      res.status(200).json({user,token});
     } catch (error) {
       console.log('In catch block');
       
@@ -40,11 +40,11 @@ const createUser = async (req, res) => {
       const { email, password } = req.body;
       const user= await User.findOne({email});
       if(!user){
-        res.status(404).json({error:"user not found"});
+        res.status(403).json({error:"user not found"});
       }
       const isMatch = await user.comparePassword(password);
       if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(403).json({ message: 'Invalid email or password' });
       }
       const token = user.generateAuthToken();
       res.cookie('token', token);
@@ -53,7 +53,7 @@ const createUser = async (req, res) => {
       res.status(200).json({token,user});
     } catch (error) {
       console.log(error);
-      res.status(400).json({ error: error.message });
+      res.status(403).json({ error: error.message });
     }
   }
   
